@@ -3,31 +3,30 @@
     <!-- Sección de búsqueda -->
     <h1>Buscador</h1>
     <p>Busca canciones, artistas o álbumes.</p>
-    <p>En esta sección ya se ha configurado una llamada a la API pública de Deezer.</p>
     <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
-  
-    <!-- Resultados de búsqueda de álbum -->
-    <div class="search-page">
-      <h1>Resultados del Álbum</h1>
-      <div class="album-info">
-        <h2>{{ albumData.title }}</h2>
-        <img :src="albumData.cover_medium" alt="Portada del álbum" />
-        <p><strong>Artista:</strong> {{ albumData.artist?.name }}</p>
-        <p><strong>Fecha de lanzamiento:</strong> {{ albumData.release_date }}</p>
-      </div>
+    
+    <!-- Campo de búsqueda de canción -->
+    <div class="search-input">
+      <input 
+        type="text" 
+        v-model="searchQuery" 
+        placeholder="Escribe el nombre de la canción" 
+        @input="searchSongs"
+      />
+    </div>
 
-      <div class="songs">
-        <h3>Canciones</h3>
-        <div class="song-cards">
-          <div
-            v-for="song in albumData.tracks?.data"
-            :key="song.id"
-            class="song-card"
-          >
-            <p><strong>{{ song.title }}</strong></p>
-            <audio :src="song.preview" controls></audio>
-            <button @click="addToPlaylist(song)">Añadir a Playlist</button>
-          </div>
+    <!-- Resultados de la búsqueda -->
+    <div class="search-page" v-if="searchResults.songs.length > 0">
+      <h2>Resultados de la Búsqueda</h2>
+      <div class="song-cards">
+        <div
+          v-for="song in searchResults.songs"
+          :key="song.id"
+          class="song-card"
+        >
+          <p><strong>{{ song.title }}</strong></p>
+          <audio :src="song.preview" controls></audio>
+          <button @click="addToPlaylist(song)">Añadir a Playlist</button>
         </div>
       </div>
     </div>
@@ -52,37 +51,39 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref } from 'vue';
 import { useMainStore } from '@/stores/stores'; // Asegúrate de que la ruta es correcta
 
-const albumData = ref({});
-const store = useMainStore();
+const searchQuery = ref(''); // Campo para la consulta de búsqueda
+const searchResults = ref({
+  songs: [],
+  albums: [],
+  artists: [],
+});
+const store = useMainStore(); // Accede al store
 
 // Accede a la playlist actual
 const playlist = store.getCurrentPlaylist;
 
-// Función para obtener datos del álbum desde la API de Deezer
-const fetchAlbumData = async () => {
+// Función para obtener datos de la API de Deezer según la búsqueda
+const searchSongs = async () => {
+  if (!searchQuery.value.trim()) {
+    searchResults.value.songs = []; // Si el campo está vacío, no muestra resultados
+    return;
+  }
+
   try {
-    const response = await fetch('https://cors-anywhere.herokuapp.com/https://api.deezer.com/album/586206062');
+    const response = await fetch(
+      `https://cors-anywhere.herokuapp.com/https://api.deezer.com/search?q=${searchQuery.value}`
+    );
     if (!response.ok) throw new Error('Error al obtener los datos');
     const data = await response.json();
     
-    albumData.value = data;
-    
-    // Actualiza el estado de búsqueda en el store
-    store.setSearchResults({
-      albums: [data],
-      songs: data.tracks.data,
-      artists: [data.artist],
-    });
+    searchResults.value.songs = data.data; // Asigna los resultados de las canciones
   } catch (error) {
     console.error('Error:', error);
   }
 };
-
-// Llama a la función al montar el componente
-onMounted(fetchAlbumData);
 
 // Función para añadir una canción a la playlist
 const addToPlaylist = (song) => {
@@ -103,22 +104,11 @@ h1 {
   padding: 20px;
 }
 
-.album-info {
-  margin-bottom: 20px;
-  padding: 15px;
-  background-color: #f8f9fa;
-  border: 1px solid #dee2e6;
-  border-radius: 10px;
-}
-
-.album-info img {
-  margin-top: 10px;
-  width: 200px;
-  border-radius: 10px;
-}
-
-.songs {
-  margin-top: 20px;
+.search-input input {
+  padding: 10px;
+  width: 100%;
+  border-radius: 5px;
+  border: 1px solid #ccc;
 }
 
 .song-cards {
