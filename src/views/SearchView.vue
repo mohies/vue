@@ -3,41 +3,42 @@
     <!-- Sección de búsqueda -->
     <h1>Buscador</h1>
     <p>Busca canciones, artistas o álbumes.</p>
-    <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo" target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
-    
+    <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo"
+        target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
+
     <!-- Campo de búsqueda de canción -->
     <div class="search-input">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
-        placeholder="Escribe el nombre de la canción" 
-        @input="searchSongs"
-      />
+      <input type="text" v-model="searchQuery" placeholder="Escribe el nombre de la canción"
+        @keyup.enter="searchSongs" />
     </div>
 
     <!-- Resultados de la búsqueda -->
     <div class="search-page" v-if="searchResults.songs.length > 0">
       <h2>Resultados de la Búsqueda</h2>
       <div class="song-cards">
-        <div
-          v-for="song in searchResults.songs"
-          :key="song.id"
-          class="song-card"
-        >
+        <div v-for="song in searchResults.songs" :key="song.id" class="song-card">
+          <!-- Mostrar imagen del álbum -->
+          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
+
           <p><strong>{{ song.title }}</strong></p>
+          <p><em>{{ song.artist.name }}</em></p> <!-- Nombre del artista -->
+
           <audio :src="song.preview" controls></audio>
           <button @click="addToPlaylist(song)">Añadir a Playlist</button>
         </div>
       </div>
     </div>
 
-    <!-- Sección de la Playlist -->
+    <!-- Sección de la Playlist (Fija en la parte inferior) -->
     <div class="playlist">
       <h2>Mi Playlist</h2>
       <div v-if="playlist.songs.length > 0">
         <ul>
           <li v-for="song in playlist.songs" :key="song.id">
-            <p>{{ song.title }}</p>
+            <!-- Mostrar imagen del álbum en la playlist -->
+            <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
+
+            <p>{{ song.title }}</p> <!-- Nombre de la canción -->
             <audio :src="song.preview" controls></audio>
             <button @click="removeFromPlaylist(song.id)">Eliminar de Playlist</button>
           </li>
@@ -78,7 +79,7 @@ const searchSongs = async () => {
     );
     if (!response.ok) throw new Error('Error al obtener los datos');
     const data = await response.json();
-    
+
     searchResults.value.songs = data.data; // Asigna los resultados de las canciones
   } catch (error) {
     console.error('Error:', error);
@@ -100,6 +101,7 @@ const removeFromPlaylist = (songId) => {
 h1 {
   color: #dc3545;
 }
+
 .search-page {
   padding: 20px;
 }
@@ -126,6 +128,12 @@ h1 {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+.song-card img {
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
 .song-card audio {
   margin-top: 10px;
   width: 100%;
@@ -145,9 +153,25 @@ button:hover {
   background-color: #218838;
 }
 
-/* Estilos para la vista de la playlist */
+/* Estilos para la vista de la playlist - Fija en la parte inferior */
 .playlist {
-  margin-top: 40px;
+  position: fixed;
+  /* Fija la playlist en la parte inferior */
+  bottom: 0;
+  /* La coloca en la parte inferior */
+  left: 0;
+  width: 100%;
+  /* Ancho completo */
+  max-height: 50%;
+  /* Limita la altura de la playlist */
+  overflow-y: auto;
+  /* Activa el scroll vertical si hay muchas canciones */
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-top: 1px solid #dee2e6;
+  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  /* Asegura que la playlist esté por encima de otros elementos */
 }
 
 ul {
@@ -156,11 +180,27 @@ ul {
 }
 
 li {
+  display: flex;
+  align-items: center;
   padding: 10px;
   margin-bottom: 10px;
   background-color: #f8f9fa;
   border-radius: 5px;
   border: 1px solid #dee2e6;
+}
+
+li img.album-cover {
+  width: 50px;
+  /* Tamaño más pequeño para la imagen */
+  height: 50px;
+  border-radius: 5px;
+  margin-right: 10px;
+}
+
+li p {
+  flex-grow: 1;
+  margin: 0;
+  padding-left: 10px;
 }
 
 audio {
