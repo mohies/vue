@@ -2,9 +2,20 @@
   <div>
     <!-- Sección de búsqueda -->
     <h1>Buscador</h1>
-    <p>Busca canciones, artistas o álbumes.</p>
+    <p>Busca canciones.</p>
     <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo"
         target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
+
+    <!-- Filtro de orden -->
+    <div class="search-filters">
+      <label>
+        <input type="checkbox" v-model="sortAscending" /> Ordenar Ascendente
+      </label>
+      <label>
+        Duración (en segundos): {{ durationRange }} s
+        <input type="range" v-model="durationRange" min="0" max="300" step="10" />
+      </label>
+    </div>
 
     <!-- Campo de búsqueda de canción -->
     <div class="search-input">
@@ -16,7 +27,7 @@
     <div class="search-page" v-if="searchResults.songs.length > 0">
       <h2>Resultados de la Búsqueda</h2>
       <div class="song-cards">
-        <div v-for="song in searchResults.songs" :key="song.id" class="song-card">
+        <div v-for="song in sortedResults" :key="song.id" class="song-card">
           <!-- Mostrar imagen del álbum -->
           <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
 
@@ -52,14 +63,14 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import { useMainStore } from '@/stores/stores'; // Asegúrate de que la ruta es correcta
 
 const searchQuery = ref(''); // Campo para la consulta de búsqueda
+const sortAscending = ref(false); // Orden ascendente
+const durationRange = ref(0); // Duración de la canción (rango)
 const searchResults = ref({
   songs: [],
-  albums: [],
-  artists: [],
 });
 const store = useMainStore(); // Accede al store
 
@@ -85,6 +96,23 @@ const searchSongs = async () => {
     console.error('Error:', error);
   }
 };
+
+// Computed property para obtener los resultados ordenados
+const sortedResults = computed(() => {
+  let results = searchResults.value.songs;
+
+  // Ordenar por duración si se ha seleccionado un rango
+  if (durationRange.value > 0) {
+    results = [...results].filter(song => song.duration <= durationRange.value); // Filtra canciones por duración
+  }
+
+  // Si el filtro de orden ascendente está activo, ordenamos por título
+  if (sortAscending.value) {
+    results = results.sort((a, b) => a.title.localeCompare(b.title));
+  }
+
+  return results;
+});
 
 // Función para añadir una canción a la playlist
 const addToPlaylist = (song) => {
@@ -156,22 +184,16 @@ button:hover {
 /* Estilos para la vista de la playlist - Fija en la parte inferior */
 .playlist {
   position: fixed;
-  /* Fija la playlist en la parte inferior */
   bottom: 0;
-  /* La coloca en la parte inferior */
   left: 0;
   width: 100%;
-  /* Ancho completo */
   max-height: 50%;
-  /* Limita la altura de la playlist */
   overflow-y: auto;
-  /* Activa el scroll vertical si hay muchas canciones */
   background-color: #f8f9fa;
   padding: 20px;
   border-top: 1px solid #dee2e6;
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
   z-index: 100;
-  /* Asegura que la playlist esté por encima de otros elementos */
 }
 
 ul {
@@ -191,7 +213,6 @@ li {
 
 li img.album-cover {
   width: 50px;
-  /* Tamaño más pequeño para la imagen */
   height: 50px;
   border-radius: 5px;
   margin-right: 10px;
@@ -220,5 +241,19 @@ button {
 
 button:hover {
   background-color: #c82333;
+}
+
+/* Estilo para los filtros de búsqueda */
+.search-filters {
+  margin-bottom: 20px;
+}
+
+.search-filters label {
+  margin-right: 20px;
+}
+
+input[type="range"] {
+  width: 100%;
+  margin-top: 10px;
 }
 </style>
