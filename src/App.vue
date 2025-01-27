@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
-import Menu from "./components/menu.vue";
+import Menu from "./components/Navbar.vue";
 
 </script>
 
@@ -15,7 +15,7 @@ import Menu from "./components/menu.vue";
 
     <!-- Menu -->
     <Menu />
-
+º
     <!-- Main Content -->
     <main class="container my-4">
       <router-view />
