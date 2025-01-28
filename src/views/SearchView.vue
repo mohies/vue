@@ -86,7 +86,7 @@ const searchSongs = async () => {
 
   try {
     const response = await fetch(
-      `https://cors-anywhere.herokuapp.com/https://api.deezer.com/search?q=${searchQuery.value}`
+      `http://localhost:8080/https://api.deezer.com/search?q=${searchQuery.value}`
     );
     if (!response.ok) throw new Error('Error al obtener los datos');
     const data = await response.json();
