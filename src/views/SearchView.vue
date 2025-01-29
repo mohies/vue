@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="search-container">
     <!-- Sección de búsqueda -->
     <h1>Buscador</h1>
     <p>Busca canciones.</p>
@@ -126,10 +126,19 @@ const removeFromPlaylist = (songId) => {
 </script>
 
 <style scoped>
+/* Fondo oscuro para el contenedor principal */
+.search-container {
+  background-color: #121212;
+  color: white;
+  padding: 20px;
+}
+
+/* Estilo del título */
 h1 {
   color: #dc3545;
 }
 
+/* Estilos para la sección de la búsqueda */
 .search-page {
   padding: 20px;
 }
@@ -139,8 +148,21 @@ h1 {
   width: 100%;
   border-radius: 5px;
   border: 1px solid #ccc;
+  background-color: #333;
+  color: white;
 }
 
+/* Estilos para los filtros */
+.search-filters {
+  margin-bottom: 20px;
+}
+
+.search-filters label {
+  margin-right: 20px;
+  color: white;
+}
+
+/* Estilo de los resultados de búsqueda */
 .song-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -151,7 +173,7 @@ h1 {
   padding: 10px;
   border: 1px solid #007bff;
   border-radius: 10px;
-  background-color: #e9ecef;
+  background-color: #2c2f38;
   text-align: center;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
@@ -189,7 +211,7 @@ button:hover {
   width: 100%;
   max-height: 50%;
   overflow-y: auto;
-  background-color: #f8f9fa;
+  background-color: #2c2f38;
   padding: 20px;
   border-top: 1px solid #dee2e6;
   box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
@@ -206,7 +228,7 @@ li {
   align-items: center;
   padding: 10px;
   margin-bottom: 10px;
-  background-color: #f8f9fa;
+  background-color: #333;
   border-radius: 5px;
   border: 1px solid #dee2e6;
 }
@@ -241,15 +263,6 @@ button {
 
 button:hover {
   background-color: #c82333;
-}
-
-/* Estilo para los filtros de búsqueda */
-.search-filters {
-  margin-bottom: 20px;
-}
-
-.search-filters label {
-  margin-right: 20px;
 }
 
 input[type="range"] {

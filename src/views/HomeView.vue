@@ -85,7 +85,7 @@ const handleSearch = async (query) => {
     if (!query.trim()) return;
 
     const response = await fetch(
-      `http://localhost:8080/https://api.deezer.com/search?q=${query}` // Cambiar la URL base
+      `http://localhost:8080/https://api.deezer.com/search?q=${query}`
     );
     if (!response.ok) throw new Error('Error al realizar la búsqueda');
     const data = await response.json();
@@ -108,14 +108,13 @@ onMounted(fetchFeaturedSongs);
 </script>
 
 <style scoped>
-/* Fuentes y colores principales */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
-
+/* Variables de colores */
 :root {
-  --primary-color: #4caf50; /* Verde moderno */
-  --secondary-color: #f5f5f5; /* Fondo suave */
-  --text-color: #333333;
-  --card-shadow: rgba(0, 0, 0, 0.1);
+  --primary-color: #1DB954; /* Verde estilo Spotify */
+  --secondary-color: #121212; /* Fondo oscuro */
+  --text-color: #ffffff;
+  --card-bg: #222222;
+  --shadow-color: rgba(0, 0, 0, 0.2);
 }
 
 .home-view {
@@ -123,40 +122,40 @@ onMounted(fetchFeaturedSongs);
   font-family: 'Inter', sans-serif;
   background-color: var(--secondary-color);
   color: var(--text-color);
-  text-align: center; /* Centrado de los textos */
+  text-align: center;
+  min-height: 100vh; /* Asegura que la página no se corte */
 }
 
-/* Título principal */
-.page-title {
-  font-size: 2.5em;
-  font-weight: 700;
-  color: var(--primary-color);
-  margin-bottom: 30px;
-}
-
-/* Títulos secundarios */
+/* Títulos */
 h2, h3 {
   color: var(--primary-color);
   font-weight: 600;
   margin-bottom: 20px;
 }
 
-/* Resultados de búsqueda y carrusel */
-.featured-carousel,
-.featured-grid,
-.search-results {
+/* Contenedor de canciones destacadas */
+.featured-carousel, .featured-grid, .search-results {
   margin-bottom: 40px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-/* Grillas */
-.song-grid, .song-grid-small {
+/* Grids de canciones */
+.song-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 20px;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
+/* Grid para canciones pequeñas */
 .song-grid-small {
-  grid-template-columns: repeat(4, 1fr); /* 4 columnas pequeñas */
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 10px;
 }
 
@@ -165,43 +164,32 @@ h2, h3 {
   text-align: center;
   padding: 15px;
   border-radius: 15px;
-  background-color: #ffffff;
-  box-shadow: 0 6px 10px var(--card-shadow);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--card-bg);
+  box-shadow: 0 4px 10px var(--shadow-color);
+  transition: transform 0.3s ease;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Asegura que los elementos se distribuyan de manera uniforme */
-  height: 350px; /* Altura fija para las tarjetas */
+  align-items: center;
+  justify-content: space-between;
+  min-height: 320px;
 }
 
-/* Título de la canción */
-.song-card p {
-  font-size: 1em; /* Ajusta el tamaño del texto */
-  font-weight: bold;
-  margin: 0;
-  overflow: hidden; /* Evita que el texto se desborde */
-  white-space: nowrap; /* No permitir que el texto se divida en varias líneas */
-  text-overflow: ellipsis; /* Añadir "..." si el texto es demasiado largo */
+.song-card:hover {
+  transform: scale(1.05);
 }
 
-/* Imágenes de álbum */
+/* Imágenes */
 .album-image {
-  margin: 10px 0;
   width: 100%;
-  max-width: 300px; /* Limitar tamaño de imagen */
-  height: auto;
+  max-width: 200px;
   border-radius: 15px;
   object-fit: cover;
-  transition: transform 0.3s ease;
-  flex-shrink: 0; /* Impide que la imagen se reduzca demasiado */
 }
 
 /* Audio */
 audio {
   margin-top: 10px;
   width: 100%;
-  border-radius: 5px;
-  flex-grow: 1; /* Permite que el audio se expanda */
 }
 
 /* Carrusel */
@@ -211,12 +199,7 @@ audio {
   padding: 10px;
 }
 
-.carousel-content img {
-  border-radius: 15px;
-}
-
-.carousel-control-prev-icon,
-.carousel-control-next-icon {
+.carousel-control-prev-icon, .carousel-control-next-icon {
   background-color: var(--primary-color);
   border-radius: 50%;
 }
@@ -233,6 +216,6 @@ button {
 }
 
 button:hover {
-  background-color: #388e3c; /* Color más oscuro */
+  background-color: #188d41;
 }
 </style>

@@ -1,55 +1,93 @@
 <script setup>
-import { RouterLink, RouterView } from 'vue-router'
 import Menu from "./components/Navbar.vue";
-
 </script>
 
 <template>
   <div id="app">
-    <!-- Header -->
-    <header class="bg-primary text-white py-3">
-      <div class="container text-center">
-        <h1>Deezer Music Client</h1>
+    <div class="layout">
+      <!-- Sidebar Fijo -->
+      <Menu />
+
+      <!-- Contenido Principal -->
+      <div class="main-content">
+        <header class="header">
+          <h1>Deezer Music Client</h1>
+        </header>
+
+        <main class="content">
+          <router-view />
+        </main>
+
+        <footer class="footer">
+          <p>&copy; 2024 Deezer Music Client. Todos los derechos reservados.</p>
+        </footer>
       </div>
-    </header>
-
-    <!-- Menu -->
-    <Menu />
-º
-    <!-- Main Content -->
-    <main class="container my-4">
-      <router-view />
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-dark text-white text-center py-3">
-      <p>&copy; 2024 Deezer Music Client. Todos los derechos reservados.</p>
-    </footer>
+    </div>
   </div>
 </template>
 
-<script setup>
-
-</script>
-
-
 <style lang="scss">
-nav{
-  border: 1px solid gray;
+/* Variables */
+$primary-color: #1DB954;
+$background-dark: #121212;
+$text-light: #ffffff;
+$text-muted: #b3b3b3;
+
+/* Layout Principal */
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden; /* Evita que la página tenga doble scroll */
 }
-$hover-bg-color: #007bff;
-$hover-text-color: #ffffff;
-li {
-    padding: 0.5rem 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s, color 0.3s;
 
-    &:hover {
-      background-color: $hover-bg-color;
-      color: $hover-text-color;
-      font-weight: bold;
-    }
-  }
+/* Sidebar (Navbar) */
+.sidebar {
+  width: 250px;
+  background-color: $background-dark;
+  color: $text-light;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 
+/* Contenido Principal */
+.main-content {
+  margin-left: 250px; /* Deja espacio para el sidebar */
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #181818;
+  color: $text-light;
+  height: 100vh;
+  overflow-y: auto; /* Permite hacer scroll en el contenido */
+}
 
+/* Header */
+.header {
+  background-color: $primary-color;
+  text-align: center;
+  padding: 15px;
+  font-size: 1.5rem;
+  font-weight: bold;
+}
+
+/* Contenido */
+.content {
+  flex-grow: 1;
+  padding: 20px;
+}
+
+/* Footer */
+.footer {
+  background-color: #181818;
+  text-align: center;
+  padding: 10px;
+  color: $text-muted;
+  font-size: 0.9rem;
+}
 </style>

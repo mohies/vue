@@ -41,11 +41,26 @@
 </template>
 
 <script setup>
+import { onMounted } from "vue";
+import { Carousel } from "bootstrap"; // Importa el módulo de Bootstrap
+
 defineProps({
   songs: {
     type: Array,
     required: true,
   },
+});
+
+// Inicializa el carrusel cuando el componente esté montado
+onMounted(() => {
+  const carouselElement = document.querySelector("#song-carousel");
+  if (carouselElement) {
+    new Carousel(carouselElement, {
+      interval: 3000, // Cambia automáticamente cada 3 segundos
+      ride: "carousel", // Inicia el carrusel al cargar
+      pause: false, // Evita que el carrusel se detenga al pasar el mouse
+    });
+  }
 });
 </script>
 
