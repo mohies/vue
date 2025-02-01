@@ -28,35 +28,22 @@
       <h2>Resultados de la Búsqueda</h2>
       <div class="song-cards">
         <div v-for="song in sortedResults" :key="song.id" class="song-card">
-          <!-- Mostrar imagen del álbum -->
           <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
-
           <p><strong>{{ song.title }}</strong></p>
-          <p><em>{{ song.artist.name }}</em></p> <!-- Nombre del artista -->
-
-          <audio :src="song.preview" controls></audio>
+          <p><em>{{ song.artist.name }}</em></p>
+          <audio :src="song.preview"></audio>
+          
+          <!-- Botón para añadir a playlist -->
           <button @click="addToPlaylist(song)">Añadir a Playlist</button>
+          
+          <!-- Botón de favoritos -->
+          <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
+            {{ isFavorite(song) ? '❤️ Quitar de Favoritos' : '🤍 Añadir a Favoritos' }}
+          </button>
+
+          <!-- Botón para reproducir canción -->
+          <button @click="playSong(song)">Reproducir</button>
         </div>
-      </div>
-    </div>
-
-    <!-- Sección de la Playlist (Fija en la parte inferior) -->
-    <div class="playlist">
-      <h2>Mi Playlist</h2>
-      <div v-if="playlist.songs.length > 0">
-        <ul>
-          <li v-for="song in playlist.songs" :key="song.id">
-            <!-- Mostrar imagen del álbum en la playlist -->
-            <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
-
-            <p>{{ song.title }}</p> <!-- Nombre de la canción -->
-            <audio :src="song.preview" controls></audio>
-            <button @click="removeFromPlaylist(song.id)">Eliminar de Playlist</button>
-          </li>
-        </ul>
-      </div>
-      <div v-else>
-        <p>No tienes canciones en tu playlist.</p>
       </div>
     </div>
   </div>
@@ -64,23 +51,20 @@
 
 <script setup>
 import { ref, computed } from 'vue';
-import { useMainStore } from '@/stores/stores'; // Asegúrate de que la ruta es correcta
+import { useMainStore } from '@/stores/stores'; 
 
-const searchQuery = ref(''); // Campo para la consulta de búsqueda
-const sortAscending = ref(false); // Orden ascendente
-const durationRange = ref(0); // Duración de la canción (rango)
+const searchQuery = ref('');
+const sortAscending = ref(false);
+const durationRange = ref(0);
 const searchResults = ref({
   songs: [],
 });
-const store = useMainStore(); // Accede al store
+const store = useMainStore();
 
-// Accede a la playlist actual
-const playlist = store.getCurrentPlaylist;
-
-// Función para obtener datos de la API de Deezer según la búsqueda
+// Buscar canciones en Deezer
 const searchSongs = async () => {
   if (!searchQuery.value.trim()) {
-    searchResults.value.songs = []; // Si el campo está vacío, no muestra resultados
+    searchResults.value.songs = [];
     return;
   }
 
@@ -91,22 +75,20 @@ const searchSongs = async () => {
     if (!response.ok) throw new Error('Error al obtener los datos');
     const data = await response.json();
 
-    searchResults.value.songs = data.data; // Asigna los resultados de las canciones
+    searchResults.value.songs = data.data;
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
-// Computed property para obtener los resultados ordenados
+// Computed para ordenar resultados
 const sortedResults = computed(() => {
   let results = searchResults.value.songs;
 
-  // Ordenar por duración si se ha seleccionado un rango
   if (durationRange.value > 0) {
-    results = [...results].filter(song => song.duration <= durationRange.value); // Filtra canciones por duración
+    results = results.filter(song => song.duration <= durationRange.value);
   }
 
-  // Si el filtro de orden ascendente está activo, ordenamos por título
   if (sortAscending.value) {
     results = results.sort((a, b) => a.title.localeCompare(b.title));
   }
@@ -114,35 +96,65 @@ const sortedResults = computed(() => {
   return results;
 });
 
-// Función para añadir una canción a la playlist
+// Playlist
 const addToPlaylist = (song) => {
-  store.addSongToPlaylist(song); // Llama a la acción del store para agregar la canción
+  store.addSongToPlaylist(song);
 };
 
-// Función para eliminar una canción de la playlist
-const removeFromPlaylist = (songId) => {
-  store.removeSongFromPlaylist(songId); // Llama a la acción del store para eliminar la canción
+// Favoritos
+const toggleFavorite = (song) => {
+  if (isFavorite(song)) {
+    store.removeFromFavorites(song.id);
+  } else {
+    store.addToFavorites(song);
+  }
+};
+
+const isFavorite = (song) => {
+  return store.favorites.some(fav => fav.id === song.id);
+};
+
+// Reproducir canción
+const playSong = (song) => {
+  store.setCurrentSong(song);  // Establece la canción actual en el store
+
+  // Esperamos a que termine la canción para reproducir la siguiente
+  if (audio.value) {
+    audio.value.onended = () => {
+      nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
+    };
+  }
+};
+
+// Función para reproducir la siguiente canción de la búsqueda
+const nextSongInSearchResults = () => {
+  const currentSongIndex = searchResults.value.songs.findIndex(song => song.id === store.getCurrentSong()?.id);
+  
+  // Si no estamos en la última canción de la lista, reproducimos la siguiente canción
+  if (currentSongIndex >= 0 && currentSongIndex < searchResults.value.songs.length - 1) {
+    const nextSong = searchResults.value.songs[currentSongIndex + 1];
+    store.setCurrentSong(nextSong);  // Cambia la canción actual en el store
+  } else {
+    // Si estamos en la última canción, volvemos a la primera canción de la lista
+    store.setCurrentSong(searchResults.value.songs[0]);
+  }
 };
 </script>
 
 <style scoped>
-/* Fondo oscuro para el contenedor principal */
+/* Fondo oscuro */
 .search-container {
   background-color: #121212;
   color: white;
   padding: 20px;
 }
 
-/* Estilo del título */
+/* Estilos de títulos */
 h1 {
   color: #dc3545;
 }
 
-/* Estilos para la sección de la búsqueda */
-.search-page {
-  padding: 20px;
-}
-
+/* Estilos de búsqueda */
 .search-input input {
   padding: 10px;
   width: 100%;
@@ -152,7 +164,7 @@ h1 {
   color: white;
 }
 
-/* Estilos para los filtros */
+/* Filtros */
 .search-filters {
   margin-bottom: 20px;
 }
@@ -162,7 +174,7 @@ h1 {
   color: white;
 }
 
-/* Estilo de los resultados de búsqueda */
+/* Estilos de resultados */
 .song-cards {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -175,7 +187,6 @@ h1 {
   border-radius: 10px;
   background-color: #2c2f38;
   text-align: center;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .song-card img {
@@ -203,70 +214,12 @@ button:hover {
   background-color: #218838;
 }
 
-/* Estilos para la vista de la playlist - Fija en la parte inferior */
-.playlist {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  max-height: 50%;
-  overflow-y: auto;
-  background-color: #2c2f38;
-  padding: 20px;
-  border-top: 1px solid #dee2e6;
-  box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
-  z-index: 100;
+/* Estilos de favoritos */
+.favorite {
+  background-color: #dc3545 !important;
 }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  margin-bottom: 10px;
-  background-color: #333;
-  border-radius: 5px;
-  border: 1px solid #dee2e6;
-}
-
-li img.album-cover {
-  width: 50px;
-  height: 50px;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-li p {
-  flex-grow: 1;
-  margin: 0;
-  padding-left: 10px;
-}
-
-audio {
-  margin-top: 10px;
-  width: 100%;
-}
-
-button {
-  margin-top: 10px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  padding: 8px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #c82333;
-}
-
-input[type="range"] {
-  width: 100%;
-  margin-top: 10px;
+.favorite:hover {
+  background-color: #c82333 !important;
 }
 </style>

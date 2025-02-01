@@ -1,5 +1,6 @@
 <script setup>
 import Menu from "./components/Navbar.vue";
+import MusicPlayer from './components/MusicPlayer.vue'; // Importamos el componente
 </script>
 
 <template>
@@ -23,6 +24,9 @@ import Menu from "./components/Navbar.vue";
         </footer>
       </div>
     </div>
+
+    <!-- MusicPlayer siempre visible en la pantalla -->
+    <MusicPlayer /> 
   </div>
 </template>
 
@@ -37,7 +41,8 @@ $text-muted: #b3b3b3;
 .layout {
   display: flex;
   height: 100vh;
-  overflow: hidden; /* Evita que la página tenga doble scroll */
+  overflow: hidden;
+  /* Evita que la página tenga doble scroll */
 }
 
 /* Sidebar (Navbar) */
@@ -57,14 +62,16 @@ $text-muted: #b3b3b3;
 
 /* Contenido Principal */
 .main-content {
-  margin-left: 250px; /* Deja espacio para el sidebar */
+  margin-left: 250px;
+  /* Deja espacio para el sidebar */
   flex-grow: 1;
   display: flex;
   flex-direction: column;
   background-color: #181818;
   color: $text-light;
   height: 100vh;
-  overflow-y: auto; /* Permite hacer scroll en el contenido */
+  overflow-y: auto;
+  /* Permite hacer scroll en el contenido */
 }
 
 /* Header */
@@ -89,5 +96,20 @@ $text-muted: #b3b3b3;
   padding: 10px;
   color: $text-muted;
   font-size: 0.9rem;
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative; /* Esto asegura que el MusicPlayer se posicione en relación a este contenedor */
+}
+
+.music-player {
+  position: fixed;
+  bottom: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
 }
 </style>

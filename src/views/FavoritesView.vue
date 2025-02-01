@@ -1,69 +1,88 @@
 <template>
-  <div class="favorites-view">
-    <h1>Favoritos</h1>
+  <div class="favorites-container">
+    <h1>Mis Favoritos</h1>
     
-    <!-- Si hay canciones favoritas, mostrar en una lista -->
-    <div v-if="favorites.length > 0">
-      <ul>
-        <li v-for="song in favorites" :key="song.id">
-          <img :src="song.album.cover_xl" alt="Cover" class="favorite-cover"/>
-          <p>{{ song.title }} - {{ song.artist.name }}</p>
-        </li>
-      </ul>
+    <div v-if="favorites.length > 0" class="favorite-songs">
+      <div v-for="song in favorites" :key="song.id" class="song-card">
+        <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
+        <p><strong>{{ song.title }}</strong></p>
+        <p><em>{{ song.artist.name }}</em></p>
+        <audio :src="song.preview" controls></audio>
+
+        <button @click="removeFromFavorites(song.id)">
+          ❌ Quitar de Favoritos
+        </button>
+      </div>
     </div>
 
-    <!-- Si no hay canciones favoritas, mostrar un mensaje -->
     <div v-else>
-      <p>No tienes canciones favoritas aún.</p>
+      <p>No tienes canciones en favoritos.</p>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { computed } from 'vue';
+import { useMainStore } from '@/stores/stores';
 
-// Datos de ejemplo para canciones favoritas
-const favorites = ref([
-  { 
-    id: 1, 
-    title: 'Song 1', 
-    artist: { name: 'Artist 1' },
-    album: { cover_xl: 'https://link_to_cover_1.jpg' }
-  },
-  { 
-    id: 2, 
-    title: 'Song 2', 
-    artist: { name: 'Artist 2' },
-    album: { cover_xl: 'https://link_to_cover_2.jpg' }
-  },
-]);
+const store = useMainStore();
 
+// Computed para obtener las canciones favoritas del store
+const favorites = computed(() => store.favorites);
+
+// Función para quitar una canción de favoritos
+const removeFromFavorites = (songId) => {
+  store.removeFromFavorites(songId);
+};
 </script>
 
 <style scoped>
-.favorites-view {
+.favorites-container {
+  background-color: #121212;
+  color: white;
   padding: 20px;
 }
 
-.favorite-cover {
-  width: 60px;
-  height: 60px;
-  margin-right: 10px;
-  border-radius: 10px;
-}
-
-ul {
-  list-style: none;
-  padding: 0;
-}
-
-li {
-  display: flex;
-  align-items: center;
-  margin-bottom: 15px;
-}
-
 h1 {
-  color: #1DB954;
+  color: #dc3545;
+}
+
+.favorite-songs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.song-card {
+  padding: 10px;
+  border: 1px solid #007bff;
+  border-radius: 10px;
+  background-color: #2c2f38;
+  text-align: center;
+}
+
+.song-card img {
+  width: 100%;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.song-card audio {
+  margin-top: 10px;
+  width: 100%;
+}
+
+button {
+  margin-top: 10px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  padding: 8px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #c82333;
 }
 </style>

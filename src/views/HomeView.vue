@@ -10,7 +10,10 @@
         <div v-for="song in searchResults" :key="song.id" class="song-card">
           <p><strong>{{ song.title }}</strong></p>
           <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
-          <audio :src="song.preview" controls></audio>
+          <!-- Reproductor de audio sin controles -->
+          <audio :src="song.preview"></audio>
+          <!-- Botón para reproducir la canción -->
+          <button @click="playSong(song)">Reproducir</button>
         </div>
       </div>
     </section>
@@ -27,7 +30,10 @@
           <div v-for="song in gridSongs" :key="song.id" class="song-card-small">
             <p><strong>{{ song.title }}</strong></p>
             <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
-            <audio :src="song.preview" controls></audio>
+            <!-- Reproductor de audio sin controles -->
+            <audio :src="song.preview"></audio>
+            <!-- Botón para reproducir la canción -->
+            <button @click="playSong(song)">Reproducir</button>
           </div>
         </div>
       </div>
@@ -40,7 +46,10 @@
         <div v-for="song in gridSongs" :key="song.id" class="song-card">
           <p><strong>{{ song.title }}</strong></p>
           <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
-          <audio :src="song.preview" controls></audio>
+          <!-- Reproductor de audio sin controles -->
+          <audio :src="song.preview"></audio>
+          <!-- Botón para reproducir la canción -->
+          <button @click="playSong(song)">Reproducir</button>
         </div>
       </div>
     </section>
@@ -52,6 +61,7 @@ import { ref, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router'; // Para gestionar las rutas
 import SearchBar from '@/components/SearchBar.vue';
 import SongCarousel from '@/components/SongCarousel.vue';
+import { useMainStore } from '@/stores/stores'; // Asegúrate de importar el store de Pinia
 
 // Datos reactivos
 const featuredSongs = ref([]);
@@ -61,6 +71,9 @@ const searchResults = ref([]); // Resultados de búsqueda
 // Obtener la ruta actual
 const route = useRoute();
 const router = useRouter();
+
+// Obtener el store
+const mainStore = useMainStore();
 
 // Función para obtener canciones destacadas
 const fetchFeaturedSongs = async () => {
@@ -94,6 +107,12 @@ const handleSearch = async (query) => {
   } catch (error) {
     console.error('Error en la búsqueda:', error);
   }
+};
+
+// Función para reproducir la canción
+const playSong = (song) => {
+  mainStore.setCurrentSong(song); // Establecer la canción actual en el store
+  // Puedes agregar lógica adicional para reproducir la canción aquí
 };
 
 // Limpiar los resultados de búsqueda al navegar

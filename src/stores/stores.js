@@ -2,88 +2,40 @@ import { defineStore } from 'pinia';
 
 export const useMainStore = defineStore('main', {
   state: () => ({
-    // Datos del usuario
-    user: {
-      name: '',
-      avatar: '',
-      isLoggedIn: false,
-    },
-
-    // Playlists
-    playlists: [
-      {
-        id: 1,
-        name: 'Mi Playlist',
-        songs: [],
-      },
-    ],
-
-    // Canción actual
     currentSong: null,
-
-    // Estado de búsqueda
-    searchResults: {
-      songs: [],
-      albums: [],
-      artists: [],
-    },
+    favorites: [],
+    songs: [], // Lista de canciones de búsqueda
   }),
-
-  getters: {
-    isUserLoggedIn: (state) => state.user.isLoggedIn,
-    getCurrentPlaylist: (state) => state.playlists[0], // Devuelve la primera playlist
-  },
-
   actions: {
-    // Manejo de usuario
-    loginUser(name, avatar) {
-      this.user = { name, avatar, isLoggedIn: true };
-      localStorage.setItem('user', JSON.stringify(this.user));
-    },
-
-    logoutUser() {
-      this.user = { name: '', avatar: '', isLoggedIn: false };
-      localStorage.removeItem('user');
-    },
-
-    loadUserFromStorage() {
-      const storedUser = JSON.parse(localStorage.getItem('user'));
-      if (storedUser) {
-        this.user = storedUser;
-      }
-    },
-
-    // Manejo de playlists
-    addSongToPlaylist(song) {
-      const playlist = this.playlists[0]; // Accedemos a la primera playlist directamente desde el estado
-      if (!playlist.songs.find((s) => s.id === song.id)) {
-        playlist.songs.push(song); // Agrega la canción a la playlist si no está ya
-        this.playlists = [...this.playlists]; // Forzamos la reactividad actualizando el estado
-      }
-    },
-
-    removeSongFromPlaylist(songId) {
-      const playlist = this.playlists[0];
-      playlist.songs = playlist.songs.filter((song) => song.id !== songId);
-      this.playlists = [...this.playlists]; // Forzamos la reactividad
-    },
-
-    // Canción actual
     setCurrentSong(song) {
       this.currentSong = song;
     },
 
-    // Búsquedas
-    setSearchResults(results) {
-      this.searchResults = results;
+    setCurrentSongToNext() {
+      if (this.songs.length > 0 && this.currentSong) {
+        const currentIndex = this.songs.findIndex(song => song.id === this.currentSong.id);
+        const nextSong = this.songs[(currentIndex + 1) % this.songs.length] || this.songs[0]; // Si es la última, volvemos a la primera
+        this.setCurrentSong(nextSong);
+      }
     },
 
-    clearSearchResults() {
-      this.searchResults = {
-        songs: [],
-        albums: [],
-        artists: [],
-      };
+    // Otros métodos de favoritos
+    addToFavorites(song) {
+      if (!this.favorites.some(fav => fav.id === song.id)) {
+        this.favorites.push(song);
+      }
+    },
+
+    removeFromFavorites(songId) {
+      this.favorites = this.favorites.filter(fav => fav.id !== songId);
     },
   },
+  getters: {
+    getCurrentSong() {
+      return this.currentSong;
+    },
+    getFavorites() {
+      return this.favorites;
+    },
+  }
 });

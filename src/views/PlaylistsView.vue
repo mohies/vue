@@ -1,34 +1,43 @@
 <template>
-    <div>
-      <h1>Playlists</h1>
-      <p>Gestiona tus playlists aquí.</p>
-    </div>
-  <!-- Integrar el componente Pinia -->
-  <PiniaComponent />
-    <!-- Mostrar datos de la store directamente -->
-    <div class="store-data">
-      <h3>Datos desde la Store:</h3>
-      <p>Email actual: {{ userEmail }}</p>
-      <p>Dominio del email: {{ emailDomain }}</p>
-    </div>
-      
-  </template>
-  
-  <script setup>
-  // Accede a la store
-import { computed } from 'vue';
-import { useUserStore } from '../stores/email';
-import PiniaComponent from '../components/pinia.vue';
-// Vincula datos de la store
-const userStore = useUserStore();
+  <div class="playlist-view">
+    <h1>Gestión de Playlists</h1>
+    
+    <!-- Mostrar el componente PlaylistManager -->
+    <PlaylistManager :playlists="playlists" @add-to-playlist="addToPlaylist" />
+  </div>
+</template>
 
-const userEmail = computed(() => userStore.email);
-const emailDomain = computed(() => userStore.emailDomain);
+<script setup>
+import { ref } from 'vue';
+import PlaylistManager from '@/components/PlaylistManager.vue';
 
-  </script>
-  
-  <style scoped>
-  h1 {
-    color: #28a745;
+const playlists = ref([
+  { id: 1, name: 'Mi Playlist 1', songs: [] },
+  { id: 2, name: 'Mi Playlist 2', songs: [] },
+]);
+
+const addToPlaylist = (playlistId, song) => {
+  const playlist = playlists.value.find(p => p.id === playlistId);
+  if (playlist && !playlist.songs.some(s => s.id === song.id)) {
+    playlist.songs.push(song);
   }
-  </style>
+};
+</script>
+
+<style scoped>
+.playlist-view {
+  background-color: #121212;
+  color: #fff;
+  padding: 30px;
+  min-height: 100vh;
+}
+
+h1 {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #1DB954;
+  text-align: center;
+  margin-bottom: 40px;
+  font-family: 'Spotify Circular', sans-serif;
+}
+</style>
