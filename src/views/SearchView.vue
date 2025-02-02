@@ -31,7 +31,7 @@
           <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
           <p><strong>{{ song.title }}</strong></p>
           <p><em>{{ song.artist.name }}</em></p>
-          <audio :src="song.preview"></audio>
+          <audio ref="audio" :src="song.preview"></audio>
           
           <!-- Botón para añadir a playlist -->
           <button @click="addToPlaylist(song)">Añadir a Playlist</button>
@@ -50,7 +50,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { useMainStore } from '@/stores/stores'; 
 
 const searchQuery = ref('');
@@ -60,6 +60,7 @@ const searchResults = ref({
   songs: [],
 });
 const store = useMainStore();
+const audio = ref(null); // Definimos la referencia al elemento audio
 
 // Buscar canciones en Deezer
 const searchSongs = async () => {
@@ -119,11 +120,15 @@ const playSong = (song) => {
   store.setCurrentSong(song);  // Establece la canción actual en el store
 
   // Esperamos a que termine la canción para reproducir la siguiente
-  if (audio.value) {
-    audio.value.onended = () => {
-      nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
-    };
-  }
+  onMounted(() => {
+    if (audio.value) {
+      audio.value.src = song.preview; // Actualizamos la fuente del audio
+      audio.value.play(); // Reproducimos la canción
+      audio.value.onended = () => {
+        nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
+      };
+    }
+  });
 };
 
 // Función para reproducir la siguiente canción de la búsqueda
@@ -134,11 +139,16 @@ const nextSongInSearchResults = () => {
   if (currentSongIndex >= 0 && currentSongIndex < searchResults.value.songs.length - 1) {
     const nextSong = searchResults.value.songs[currentSongIndex + 1];
     store.setCurrentSong(nextSong);  // Cambia la canción actual en el store
+    playSong(nextSong); // Reproducimos la siguiente canción
   } else {
     // Si estamos en la última canción, volvemos a la primera canción de la lista
-    store.setCurrentSong(searchResults.value.songs[0]);
+    const firstSong = searchResults.value.songs[0];
+    store.setCurrentSong(firstSong);
+    playSong(firstSong); // Reproducimos la primera canción
   }
 };
+
+console.log("Playlist actual:", store.getPlaylist);
 </script>
 
 <style scoped>

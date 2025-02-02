@@ -1,40 +1,24 @@
 <template>
   <div class="playlist-manager">
-    <div v-for="playlist in playlists" :key="playlist.id" class="playlist-card">
+    <div class="playlist-card">
       <div class="playlist-header">
         <h3>{{ playlist.name }}</h3>
-        <button @click="addRandomSongToPlaylist(playlist.id)" class="add-song-btn">Agregar Canción</button>
       </div>
 
       <ul class="song-list">
-        <li v-for="song in playlist.songs" :key="song.id" class="song-item">
-          {{ song.title }}
-        </li>
+        <PlaylistItem v-for="song in playlist.songs" :key="song.id" :song="song" />
       </ul>
     </div>
   </div>
 </template>
 
 <script setup>
-// Definir las propiedades que el componente recibe
-import { defineProps } from 'vue';
+import { useMainStore } from '@/stores/stores';
+import { storeToRefs } from 'pinia';
+import PlaylistItem from '@/components/PlaylistItem.vue';
 
-// Definir los eventos que el componente emitirá
-const emit = defineEmits(['add-to-playlist']);
-
-const props = defineProps({
-  playlists: Array,
-});
-
-const addRandomSongToPlaylist = (playlistId) => {
-  const randomSong = {
-    id: Date.now(),
-    title: 'Canción Aleatoria ' + Math.floor(Math.random() * 100),
-  };
-
-  // Emitir el evento con los parámetros necesarios
-  emit('add-to-playlist', playlistId, randomSong);
-};
+const store = useMainStore();
+const { playlist } = storeToRefs(store);
 </script>
 
 <style scoped>
