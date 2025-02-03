@@ -17,14 +17,6 @@ export const useMainStore = defineStore('main', {
       this.currentSong = song;
     },
 
-    setCurrentSongToNext() {
-      if (this.songs.length > 0 && this.currentSong) {
-        const currentIndex = this.songs.findIndex(song => song.id === this.currentSong.id);
-        const nextSong = this.songs[(currentIndex + 1) % this.songs.length] || this.songs[0]; // Si es la última, volvemos a la primera
-        this.setCurrentSong(nextSong);
-      }
-    },
-
     // Métodos de favoritos
     addToFavorites(song) {
       if (!this.favorites.some(fav => fav.id === song.id)) {

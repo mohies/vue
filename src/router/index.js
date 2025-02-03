@@ -1,9 +1,10 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from 'vue-router';
 
 import HomeView from '../views/HomeView.vue';
 import PlaylistsView from '../views/PlaylistsView.vue';
 import SearchView from '../views/SearchView.vue';
-import FavoritesView from '../views/FavoritesView.vue';  // Importa la vista de Favoritos
+import FavoritesView from '../views/FavoritesView.vue';
+import InfoView from '../views/InfoView.vue'; // Importa la vista InfoView
 
 const routes = [
   {
@@ -22,15 +23,20 @@ const routes = [
     component: SearchView,
   },
   {
-    path: '/favorites',  // Ruta para la vista de favoritos
+    path: '/favorites',
     name: 'Favoritos',
-    component: FavoritesView,  // La vista que creaste para Favoritos
+    component: FavoritesView,
+  },
+  {
+    path: '/info/:id',
+    name: 'Info',
+    component: InfoView, // Añade la ruta para InfoView
   },
 ];
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes,
-})
+});
 
 export default router;

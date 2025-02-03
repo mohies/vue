@@ -34,7 +34,9 @@
           <audio ref="audio" :src="song.preview"></audio>
           
           <!-- Botón para añadir a playlist -->
-          <button @click="addToPlaylist(song)">Añadir a Playlist</button>
+          <button @click="togglePlaylist(song)" :class="{ 'in-playlist': isInPlaylist(song) }">
+            {{ isInPlaylist(song) ? 'Quitar de Playlist' : 'Añadir a Playlist' }}
+          </button>
           
           <!-- Botón de favoritos -->
           <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
@@ -50,7 +52,8 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
+import { useRoute } from 'vue-router';
 import { useMainStore } from '@/stores/stores'; 
 
 const searchQuery = ref('');
@@ -61,6 +64,8 @@ const searchResults = ref({
 });
 const store = useMainStore();
 const audio = ref(null); // Definimos la referencia al elemento audio
+
+const route = useRoute();
 
 // Buscar canciones en Deezer
 const searchSongs = async () => {
@@ -98,8 +103,16 @@ const sortedResults = computed(() => {
 });
 
 // Playlist
-const addToPlaylist = (song) => {
-  store.addSongToPlaylist(song);
+const togglePlaylist = (song) => {
+  if (isInPlaylist(song)) {
+    store.removeSongFromPlaylist(song.id);
+  } else {
+    store.addSongToPlaylist(song);
+  }
+};
+
+const isInPlaylist = (song) => {
+  return store.getPlaylist.songs.some(s => s.id === song.id);
 };
 
 // Favoritos
@@ -120,33 +133,30 @@ const playSong = (song) => {
   store.setCurrentSong(song);  // Establece la canción actual en el store
 
   // Esperamos a que termine la canción para reproducir la siguiente
-  onMounted(() => {
-    if (audio.value) {
-      audio.value.src = song.preview; // Actualizamos la fuente del audio
-      audio.value.play(); // Reproducimos la canción
-      audio.value.onended = () => {
-        nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
-      };
-    }
-  });
-};
-
-// Función para reproducir la siguiente canción de la búsqueda
-const nextSongInSearchResults = () => {
-  const currentSongIndex = searchResults.value.songs.findIndex(song => song.id === store.getCurrentSong()?.id);
-  
-  // Si no estamos en la última canción de la lista, reproducimos la siguiente canción
-  if (currentSongIndex >= 0 && currentSongIndex < searchResults.value.songs.length - 1) {
-    const nextSong = searchResults.value.songs[currentSongIndex + 1];
-    store.setCurrentSong(nextSong);  // Cambia la canción actual en el store
-    playSong(nextSong); // Reproducimos la siguiente canción
-  } else {
-    // Si estamos en la última canción, volvemos a la primera canción de la lista
-    const firstSong = searchResults.value.songs[0];
-    store.setCurrentSong(firstSong);
-    playSong(firstSong); // Reproducimos la primera canción
+  if (audio.value) {
+    audio.value.src = song.preview; // Actualizamos la fuente del audio
+    audio.value.play(); // Reproducimos la canción
+    audio.value.onended = () => {
+      nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
+    };
   }
 };
+
+// Actualizar la búsqueda cuando cambie la ruta
+watch(() => route.query.q, (newQuery) => {
+  if (newQuery) {
+    searchQuery.value = newQuery;
+    searchSongs();
+  }
+});
+
+// Ejecutar la búsqueda inicial si hay un término de búsqueda en la ruta
+onMounted(() => {
+  if (route.query.q) {
+    searchQuery.value = route.query.q;
+    searchSongs();
+  }
+});
 
 console.log("Playlist actual:", store.getPlaylist);
 </script>
@@ -218,10 +228,12 @@ button {
   padding: 8px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 button:hover {
   background-color: #218838;
+  transform: scale(1.05);
 }
 
 /* Estilos de favoritos */
@@ -231,5 +243,14 @@ button:hover {
 
 .favorite:hover {
   background-color: #c82333 !important;
+}
+
+/* Estilos de playlist */
+.in-playlist {
+  background-color: #ffc107 !important;
+}
+
+.in-playlist:hover {
+  background-color: #e0a800 !important;
 }
 </style>

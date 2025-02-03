@@ -95,17 +95,6 @@ watch(() => audio.value?.currentTime, (newTime) => {
   currentTime.value = newTime;
 });
 
-// Función para cambiar a la siguiente canción cuando termine la actual
-const nextSong = () => {
-  store.setCurrentSongToNext(); // Cambia la canción en el store
-
-  if (audio.value) {
-    audio.value.pause(); // Pausamos el audio antes de cargar la nueva canción
-    audio.value.currentTime = 0; // Reiniciamos el tiempo
-    isPlaying.value = false; // Establecemos el estado como pausado
-  }
-};
-
 // Función para actualizar el progreso del audio
 const updateProgress = () => {
   if (audio.value) {
