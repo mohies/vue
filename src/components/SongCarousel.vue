@@ -8,8 +8,7 @@
         :key="song.id"
       >
         <div class="carousel-content">
-          <!-- Cambiado a cover_xl -->
-          <img :src="song.album.cover_xl" class="d-block w-100" alt="Song Cover" />
+          <img :src="song.album.cover_xl" class="d-block w-100 carousel-image" alt="Song Cover" />
           <div class="carousel-caption d-none d-md-block">
             <h5>{{ song.title }}</h5>
             <p>{{ song.artist.name }}</p>
@@ -65,10 +64,23 @@ onMounted(() => {
 </script>
 
 <style scoped>
+.carousel-content {
+  height: 500px; /* Mantén una altura consistente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .carousel-content img {
   border-radius: 15px;
-  max-height: 500px; /* Limita la altura máxima */
+  max-height: 100%; /* Limita la altura máxima */
   object-fit: cover; /* Ajusta la imagen sin deformarla */
+}
+
+.carousel-image {
+  width: 100%;
+  height: 100%; /* Mantén una altura consistente */
+  object-fit: cover;
 }
 
 .carousel-caption {

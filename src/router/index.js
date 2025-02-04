@@ -28,9 +28,10 @@ const routes = [
     component: FavoritesView,
   },
   {
-    path: '/info/:id',
+    path: '/info/:type/:id',
     name: 'Info',
-    component: InfoView, // Añade la ruta para InfoView
+    component: InfoView,
+    props: true,
   },
 ];
 

@@ -28,9 +28,9 @@
       <h2>Resultados de la Búsqueda</h2>
       <div class="song-cards">
         <div v-for="song in sortedResults" :key="song.id" class="song-card">
-          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
-          <p><strong>{{ song.title }}</strong></p>
-          <p><em>{{ song.artist.name }}</em></p>
+          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" @click="navigateToInfo('album', song.album.id)" />
+          <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
+          <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em></p>
           <audio ref="audio" :src="song.preview"></audio>
           
           <!-- Botón para añadir a playlist -->
@@ -53,7 +53,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 import { useMainStore } from '@/stores/stores'; 
 
 const searchQuery = ref('');
@@ -66,6 +66,11 @@ const store = useMainStore();
 const audio = ref(null); // Definimos la referencia al elemento audio
 
 const route = useRoute();
+const router = useRouter();
+
+const navigateToInfo = (type, id) => {
+  router.push({ name: 'Info', params: { type, id } });
+};
 
 // Buscar canciones en Deezer
 const searchSongs = async () => {
@@ -252,5 +257,36 @@ button:hover {
 
 .in-playlist:hover {
   background-color: #e0a800 !important;
+}
+
+.album-cover {
+  transition: transform 0.3s ease;
+}
+
+.album-cover:hover {
+  transform: scale(1.1);
+}
+
+.hover-underline {
+  cursor: pointer;
+  position: relative;
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+  bottom: -2px;
+  left: 0;
+  transform: scaleX(0);
+  transform-origin: bottom right;
+  transition: transform 0.25s ease-out;
+}
+
+.hover-underline:hover::after {
+  transform: scaleX(1);
+  transform-origin: bottom left;
 }
 </style>

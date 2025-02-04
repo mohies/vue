@@ -1,4 +1,4 @@
-  <template>
+<template>
     <div class="home-view">
       <!-- Barra de búsqueda -->
       <SearchBar @search="handleSearch" />
@@ -9,7 +9,7 @@
         <div class="song-grid">
           <div v-for="song in searchResults" :key="song.id" class="song-card">
             <p><strong>{{ song.title }}</strong></p>
-            <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
+            <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" @click="navigateToAlbum(song.album.id)" />
             <!-- Reproductor de audio sin controles -->
             <audio :src="song.preview"></audio>
             <!-- Botón para reproducir la canción -->
@@ -29,7 +29,7 @@
           <div class="song-grid-small">
             <div v-for="song in gridSongs" :key="song.id" class="song-card-small">
               <p><strong>{{ song.title }}</strong></p>
-              <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
+              <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" @click="navigateToAlbum(song.album.id)" />
               <!-- Reproductor de audio sin controles -->
               <audio :src="song.preview"></audio>
               <!-- Botón para reproducir la canción -->
@@ -45,7 +45,7 @@
         <div class="song-grid">
           <div v-for="song in gridSongs" :key="song.id" class="song-card">
             <p><strong>{{ song.title }}</strong></p>
-            <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" />
+            <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image" @click="navigateToAlbum(song.album.id)" />
             <!-- Reproductor de audio sin controles -->
             <audio :src="song.preview"></audio>
             <!-- Botón para reproducir la canción -->
@@ -102,6 +102,11 @@
   const playSong = (song) => {
     mainStore.setCurrentSong(song); // Establecer la canción actual en el store
     // Puedes agregar lógica adicional para reproducir la canción aquí
+  };
+
+  // Función para navegar a la página del álbum
+  const navigateToAlbum = (albumId) => {
+    router.push({ name: 'Info', params: { type: 'album', id: albumId } });
   };
 
   // Limpiar los resultados de búsqueda al navegar
