@@ -1,6 +1,16 @@
 <script setup>
+import { ref, onMounted, watch } from 'vue';
 import Menu from "./components/Navbar.vue";
-import MusicPlayer from './components/MusicPlayer.vue'; // Importamos el componente
+import MusicPlayer from './components/MusicPlayer.vue';
+import WelcomeModal from './components/WelcomeModal.vue';
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
+const isUserLoggedIn = ref(!!userStore.user.name);
+
+watch(() => userStore.user.name, (newName) => {
+  isUserLoggedIn.value = !!newName;
+});
 </script>
 
 <template>
@@ -26,7 +36,10 @@ import MusicPlayer from './components/MusicPlayer.vue'; // Importamos el compone
     </div>
 
     <!-- MusicPlayer siempre visible en la pantalla -->
-    <MusicPlayer /> 
+    <MusicPlayer />
+
+    <!-- Welcome Modal -->
+    <WelcomeModal v-if="!isUserLoggedIn" />
   </div>
 </template>
 

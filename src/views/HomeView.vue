@@ -62,6 +62,7 @@
   import SearchBar from '@/components/SearchBar.vue';
   import SongCarousel from '@/components/SongCarousel.vue';
   import { useMainStore } from '@/stores/stores'; // Asegúrate de importar el store de Pinia
+  import { useUserStore } from '@/stores/user';
 
   // Datos reactivos
   const featuredSongs = ref([]);
@@ -74,6 +75,8 @@
 
   // Obtener el store
   const mainStore = useMainStore();
+  const userStore = useUserStore();
+  const user = userStore.user;
 
   // Función para obtener canciones destacadas
   const fetchFeaturedSongs = async () => {

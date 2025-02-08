@@ -7,6 +7,12 @@
       <!-- Nombre de la app -->
       <router-link class="navbar-brand" to="/">🎵 Mi Música</router-link>
 
+      <!-- User Info -->
+      <div class="user-info" v-if="user.name">
+        <img :src="user.avatar" alt="User Avatar" class="avatar" />
+        <p>{{ user.name }}</p>
+      </div>
+
       <ul class="navbar-nav">
         <li class="nav-item">
           <router-link class="nav-link" to="/">Home</router-link>
@@ -24,16 +30,20 @@
       </ul>
 
       <!-- Botón de Logout -->
-      <button class="logout-btn" @click="logout">Logout</button>
+      <button class="logout-btn" v-if="user.name" @click="logout">Logout</button>
     </div>
   </nav>
 </template>
 
 <script setup>
-import { RouterLink } from "vue-router";
+import { useUserStore } from '@/stores/user';
+
+const userStore = useUserStore();
+const user = userStore.user;
 
 const logout = () => {
-  console.log("Cerrar sesión");
+  userStore.clearUser();
+  location.reload();
 };
 </script>
 
@@ -112,5 +122,17 @@ const logout = () => {
 
 .logout-btn:hover {
   background-color: #18a748;
+}
+
+.user-info {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.avatar {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  margin-bottom: 10px;
 }
 </style>
