@@ -1,8 +1,8 @@
 <template>
-  <div class="music-player">
+  <div class="music-player" :class="{ 'no-song': !currentSong }">
     <div class="player-container">
-      <div class="album-cover">
-        <img :src="currentSong?.album.cover_medium || 'https://via.placeholder.com/80x80?text=No+Song'" alt="Album cover" />
+      <div class="album-cover" v-if="currentSong">
+        <img :src="currentSong?.album.cover_medium" alt="Album cover" />
       </div>
       <div class="player-info">
         <h3 class="song-title">{{ currentSong?.title || 'No hay canción seleccionada' }}</h3>
@@ -129,6 +129,11 @@ const formatTime = (time) => {
   align-items: center;
   justify-content: space-between;
   flex-direction: column;
+}
+
+.music-player.no-song {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 .player-container {
