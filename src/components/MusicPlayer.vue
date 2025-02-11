@@ -43,6 +43,9 @@ import { useMainStore } from '@/stores/stores';
 
 const store = useMainStore();
 const currentSong = computed(() => store.getCurrentSong);
+const playlist = computed(() => store.getPlaylist);
+const favorites = computed(() => store.getFavorites);
+const currentIndex = ref(0);
 
 // Referencia al elemento audio
 const audio = ref(null);
@@ -100,6 +103,20 @@ const updateProgress = () => {
   if (audio.value) {
     currentTime.value = audio.value.currentTime;
     duration.value = audio.value.duration;
+  }
+};
+
+// Función para reproducir la siguiente canción en la lista de reproducción o favoritos
+const nextSong = () => {
+  const currentIndexInPlaylist = playlist.value.songs.findIndex(song => song.id === currentSong.value.id);
+  const currentIndexInFavorites = favorites.value.findIndex(song => song.id === currentSong.value.id);
+
+  if (currentIndexInPlaylist !== -1) {
+    const nextIndex = (currentIndexInPlaylist + 1) % playlist.value.songs.length;
+    store.setCurrentSong(playlist.value.songs[nextIndex]);
+  } else if (currentIndexInFavorites !== -1) {
+    const nextIndex = (currentIndexInFavorites + 1) % favorites.value.length;
+    store.setCurrentSong(favorites.value[nextIndex]);
   }
 };
 

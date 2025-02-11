@@ -2,16 +2,17 @@
   <div class="favorites-container">
     <h1>Mis Favoritos</h1>
     
-    <div v-if="favorites.length > 0" class="favorite-songs">
-      <div v-for="song in favorites" :key="song.id" class="song-card">
+    <div v-if="favorites.length > 0" class="favorite-list">
+      <div v-for="song in favorites" :key="song.id" class="favorite-item">
         <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
-        <p><strong>{{ song.title }}</strong></p>
-        <p><em>{{ song.artist.name }}</em></p>
-        <audio :src="song.preview" controls></audio>
-
+        <div class="song-info">
+          <p><strong>{{ song.title }}</strong></p>
+          <p><em>{{ song.artist.name }}</em></p>
+        </div>
         <button @click="removeFromFavorites(song.id)">
           ❌ Quitar de Favoritos
         </button>
+        <button @click="playSong(song)">Reproducir</button>
       </div>
     </div>
 
@@ -34,6 +35,11 @@ const favorites = computed(() => store.favorites);
 const removeFromFavorites = (songId) => {
   store.removeFromFavorites(songId);
 };
+
+// Función para reproducir una canción
+const playSong = (song) => {
+  store.setCurrentSong(song);
+};
 </script>
 
 <style scoped>
@@ -47,42 +53,54 @@ h1 {
   color: #dc3545;
 }
 
-.favorite-songs {
+.favorite-list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
-.song-card {
+.favorite-item {
+  display: flex;
+  align-items: center;
   padding: 10px;
   border: 1px solid #007bff;
   border-radius: 10px;
   background-color: #2c2f38;
-  text-align: center;
 }
 
-.song-card img {
-  width: 100%;
+.album-cover {
+  width: 80px;
+  height: 80px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
-.song-card audio {
-  margin-top: 10px;
-  width: 100%;
+.song-info {
+  flex-grow: 1;
 }
 
 button {
-  margin-top: 10px;
+  margin-left: 10px;
   background-color: #dc3545;
   color: white;
   border: none;
   padding: 8px;
   border-radius: 5px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 button:hover {
   background-color: #c82333;
+  transform: scale(1.05);
+}
+
+button.play {
+  background-color: #28a745;
+}
+
+button.play:hover {
+  background-color: #218838;
+  transform: scale(1.05);
 }
 </style>

@@ -24,13 +24,15 @@
     </div>
 
     <!-- Resultados de la búsqueda -->
-    <div class="search-page" v-if="searchResults.songs.length > 0">
+    <div class="search-page" v-if="filteredResults.length > 0">
       <h2>Resultados de la Búsqueda</h2>
-      <div class="song-cards">
-        <div v-for="song in sortedResults" :key="song.id" class="song-card">
+      <div class="song-list" v-if="filterType === 'songs'">
+        <div v-for="song in filteredResults" :key="song.id" class="song-item">
           <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" @click="navigateToInfo('album', song.album.id)" />
-          <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
-          <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em></p>
+          <div class="song-info">
+            <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
+            <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em></p>
+          </div>
           <audio ref="audio" :src="song.preview"></audio>
           
           <!-- Botón para añadir a playlist -->
@@ -47,6 +49,19 @@
           <button @click="playSong(song)">Reproducir</button>
         </div>
       </div>
+      <div class="album-cards" v-if="filterType === 'albums'">
+        <div v-for="album in filteredResults" :key="album.id" class="album-card">
+          <img :src="album.cover_medium" alt="Album cover" class="album-cover" @click="navigateToInfo('album', album.id)" />
+          <p><strong @click="navigateToInfo('album', album.id)" class="hover-underline">{{ album.title }}</strong></p>
+          <p><em @click="navigateToInfo('artist', album.artist.id)" class="hover-underline">{{ album.artist.name }}</em></p>
+        </div>
+      </div>
+      <div class="artist-cards" v-if="filterType === 'artists'">
+        <div v-for="artist in filteredResults" :key="artist.id" class="artist-card">
+          <img :src="artist.picture_medium" alt="Artist image" class="artist-image" @click="navigateToInfo('artist', artist.id)" />
+          <p><strong @click="navigateToInfo('artist', artist.id)" class="hover-underline">{{ artist.name }}</strong></p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
@@ -61,7 +76,10 @@ const sortAscending = ref(false);
 const durationRange = ref(0);
 const searchResults = ref({
   songs: [],
+  albums: [],
+  artists: []
 });
+const filterType = ref('songs');
 const store = useMainStore();
 const audio = ref(null); // Definimos la referencia al elemento audio
 
@@ -76,6 +94,8 @@ const navigateToInfo = (type, id) => {
 const searchSongs = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value.songs = [];
+    searchResults.value.albums = [];
+    searchResults.value.artists = [];
     return;
   }
 
@@ -86,18 +106,27 @@ const searchSongs = async () => {
     if (!response.ok) throw new Error('Error al obtener los datos');
     const data = await response.json();
 
-    searchResults.value.songs = data.data;
+    searchResults.value.songs = data.data.filter(item => item.type === 'track');
+    searchResults.value.albums = data.data.filter(item => item.type === 'album');
+    searchResults.value.artists = data.data.filter(item => item.type === 'artist');
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
 // Computed para ordenar resultados
-const sortedResults = computed(() => {
-  let results = searchResults.value.songs;
+const filteredResults = computed(() => {
+  let results = [];
 
-  if (durationRange.value > 0) {
-    results = results.filter(song => song.duration <= durationRange.value);
+  if (filterType.value === 'songs') {
+    results = searchResults.value.songs;
+    if (durationRange.value > 0) {
+      results = results.filter(song => song.duration <= durationRange.value);
+    }
+  } else if (filterType.value === 'albums') {
+    results = searchResults.value.albums;
+  } else if (filterType.value === 'artists') {
+    results = searchResults.value.artists;
   }
 
   if (sortAscending.value) {
@@ -199,34 +228,65 @@ h1 {
   color: white;
 }
 
+/* Botones de filtro */
+.filter-buttons {
+  margin-bottom: 20px;
+}
+
+.filter-buttons button {
+  margin-right: 10px;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  transition: background-color 0.3s ease;
+}
+
+.filter-buttons button.active {
+  background-color: #0056b3;
+}
+
+.filter-buttons button:hover {
+  background-color: #0056b3;
+}
+
 /* Estilos de resultados */
-.song-cards {
+.song-list,
+.album-cards,
+.artist-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: 1fr;
   gap: 20px;
 }
 
-.song-card {
+.song-item,
+.album-card,
+.artist-card {
+  display: flex;
+  align-items: center;
   padding: 10px;
   border: 1px solid #007bff;
   border-radius: 10px;
   background-color: #2c2f38;
-  text-align: center;
 }
 
-.song-card img {
-  width: 100%;
+.song-item img,
+.album-card img,
+.artist-card img {
+  width: 80px;
+  height: 80px;
   border-radius: 5px;
-  margin-bottom: 10px;
+  margin-right: 10px;
 }
 
-.song-card audio {
-  margin-top: 10px;
-  width: 100%;
+.song-info {
+  flex-grow: 1;
 }
 
 button {
-  margin-top: 10px;
+  margin-left: 10px;
   background-color: #28a745;
   color: white;
   border: none;
@@ -259,11 +319,13 @@ button:hover {
   background-color: #e0a800 !important;
 }
 
-.album-cover {
+.album-cover,
+.artist-image {
   transition: transform 0.3s ease;
 }
 
-.album-cover:hover {
+.album-cover:hover,
+.artist-image:hover {
   transform: scale(1.1);
 }
 
