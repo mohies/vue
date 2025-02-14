@@ -46,7 +46,9 @@ const saveUser = () => {
 };
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/assets/styles.scss' as *;
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -61,18 +63,18 @@ const saveUser = () => {
 }
 
 .modal-content {
-  background: #121212;
+  background: $secondary-color;
   padding: 40px;
   border-radius: 10px;
   text-align: center;
-  color: white;
+  color: $text-color;
   width: 90%;
   max-width: 400px;
   z-index: 10001; /* Ensure it is above the carousel arrows */
 }
 
 h2 {
-  color: #1DB954;
+  color: $primary-color;
   margin-bottom: 20px;
 }
 
@@ -92,7 +94,7 @@ input[type="text"] {
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #222;
-  color: white;
+  color: $text-color;
 }
 
 .avatar-options {
@@ -110,13 +112,13 @@ input[type="text"] {
 }
 
 .avatar-options img.selected {
-  border-color: #1DB954;
+  border-color: $primary-color;
 }
 
 button {
   margin-top: 20px;
-  background-color: #1DB954;
-  color: white;
+  background-color: $primary-color;
+  color: $text-color;
   border: none;
   padding: 10px 15px;
   border-radius: 5px;
@@ -125,6 +127,6 @@ button {
 }
 
 button:hover {
-  background-color: #188d41;
+  background-color: $button-hover;
 }
 </style>

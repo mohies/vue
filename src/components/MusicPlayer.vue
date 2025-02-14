@@ -43,9 +43,6 @@ import { useMainStore } from '@/stores/stores';
 
 const store = useMainStore();
 const currentSong = computed(() => store.getCurrentSong);
-const playlist = computed(() => store.getPlaylist);
-const favorites = computed(() => store.getFavorites);
-const currentIndex = ref(0);
 
 // Referencia al elemento audio
 const audio = ref(null);
@@ -106,20 +103,6 @@ const updateProgress = () => {
   }
 };
 
-// Función para reproducir la siguiente canción en la lista de reproducción o favoritos
-const nextSong = () => {
-  const currentIndexInPlaylist = playlist.value.songs.findIndex(song => song.id === currentSong.value.id);
-  const currentIndexInFavorites = favorites.value.findIndex(song => song.id === currentSong.value.id);
-
-  if (currentIndexInPlaylist !== -1) {
-    const nextIndex = (currentIndexInPlaylist + 1) % playlist.value.songs.length;
-    store.setCurrentSong(playlist.value.songs[nextIndex]);
-  } else if (currentIndexInFavorites !== -1) {
-    const nextIndex = (currentIndexInFavorites + 1) % favorites.value.length;
-    store.setCurrentSong(favorites.value[nextIndex]);
-  }
-};
-
 // Formato de tiempo (minutos:segundos)
 const formatTime = (time) => {
   const minutes = Math.floor(time / 60);
@@ -128,16 +111,17 @@ const formatTime = (time) => {
 };
 </script>
 
-<style scoped>
-/* Estilos del reproductor de música */
+<style lang="scss" scoped>
+@use '@/assets/styles.scss' as *;
+
 .music-player {
   position: fixed;
   bottom: 0;
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  background-color: #181818;
-  color: white;
+  background-color: $background-dark;
+  color: $text-light;
   border-radius: 15px;
   padding: 15px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
@@ -200,10 +184,10 @@ const formatTime = (time) => {
 }
 
 .play-btn {
-  background-color: #1DB954;
+  background-color: $primary-color;
   border: none;
   border-radius: 50%;
-  color: white;
+  color: $text-light;
   font-size: 1.5rem;
   padding: 15px;
   cursor: pointer;
@@ -212,7 +196,7 @@ const formatTime = (time) => {
 }
 
 .play-btn:hover {
-  background-color: #17a84f;
+  background-color: $button-hover;
 }
 
 .progress-bar {
@@ -227,7 +211,7 @@ const formatTime = (time) => {
 
 .progress-bar::-webkit-slider-thumb {
   appearance: none;
-  background-color: #1DB954;
+  background-color: $primary-color;
   border-radius: 50%;
   height: 15px;
   width: 15px;
@@ -236,15 +220,15 @@ const formatTime = (time) => {
 
 .time-display {
   margin-left: 15px;
-  color: white;
+  color: $text-light;
   font-size: 0.9rem;
 }
 
 .next-btn {
-  background-color: #007bff;
+  background-color: $next-btn-color;
   border: none;
   border-radius: 50%;
-  color: white;
+  color: $text-light;
   font-size: 1rem;
   padding: 10px;
   cursor: pointer;
@@ -253,7 +237,7 @@ const formatTime = (time) => {
 }
 
 .next-btn:hover {
-  background-color: #0056b3;
+  background-color: $next-btn-hover;
 }
 
 .no-song {

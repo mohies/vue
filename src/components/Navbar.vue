@@ -47,19 +47,20 @@ const logout = () => {
 };
 </script>
 
-<style scoped>
-/* Sidebar fijo a la izquierda */
+<style lang="scss" scoped>
+@use '@/assets/styles.scss' as *;
+
 .sidebar {
   position: fixed;
   left: 0;
   top: 0;
   width: 250px;
   height: 100vh;
-  background-color: #121212; /* Fondo oscuro */
-  color: white;
+  background-color: $secondary-color;
+  color: $text-color;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Asegura que los elementos se distribuyan de manera uniforme */
+  justify-content: space-between;
   padding: 20px;
   align-items: center;
 }
@@ -77,7 +78,7 @@ const logout = () => {
 .navbar-brand {
   font-size: 1.5rem;
   font-weight: bold;
-  color: #1DB954; /* Color verde tipo Spotify */
+  color: $primary-color;
   text-decoration: none;
   margin-bottom: 30px;
   display: block;
@@ -96,20 +97,20 @@ const logout = () => {
 }
 
 .nav-link {
-  color: white;
+  color: $text-color;
   font-size: 1.2rem;
   text-decoration: none;
   transition: color 0.3s;
 }
 
 .nav-link:hover {
-  color: #1DB954;
+  color: $primary-color;
 }
 
 /* Botón de Logout */
 .logout-btn {
-  background-color: #1DB954;
-  color: white;
+  background-color: $primary-color;
+  color: $text-color;
   border: none;
   padding: 10px 15px;
   font-size: 1rem;
@@ -121,7 +122,7 @@ const logout = () => {
 }
 
 .logout-btn:hover {
-  background-color: #18a748;
+  background-color: $button-hover;
 }
 
 .user-info {

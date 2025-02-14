@@ -44,11 +44,7 @@ watch(() => userStore.user.name, (newName) => {
 </template>
 
 <style lang="scss">
-/* Variables */
-$primary-color: #1DB954;
-$background-dark: #121212;
-$text-light: #ffffff;
-$text-muted: #b3b3b3;
+@use '@/assets/styles.scss' as *;
 
 /* Layout Principal */
 .layout {

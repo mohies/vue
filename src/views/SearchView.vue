@@ -195,11 +195,12 @@ onMounted(() => {
 console.log("Playlist actual:", store.getPlaylist);
 </script>
 
-<style scoped>
-/* Fondo oscuro */
+<style lang="scss" scoped>
+@use '@/assets/styles.scss' as *;
+
 .search-container {
-  background-color: #121212;
-  color: white;
+  background-color: $secondary-color;
+  color: $text-color;
   padding: 20px;
 }
 
@@ -215,7 +216,7 @@ h1 {
   border-radius: 5px;
   border: 1px solid #ccc;
   background-color: #333;
-  color: white;
+  color: $text-color;
 }
 
 /* Filtros */
@@ -225,7 +226,7 @@ h1 {
 
 .search-filters label {
   margin-right: 20px;
-  color: white;
+  color: $text-color;
 }
 
 /* Botones de filtro */
@@ -239,17 +240,17 @@ h1 {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  background-color: #007bff;
-  color: white;
+  background-color: $next-btn-color;
+  color: $text-color;
   transition: background-color 0.3s ease;
 }
 
 .filter-buttons button.active {
-  background-color: #0056b3;
+  background-color: $next-btn-hover;
 }
 
 .filter-buttons button:hover {
-  background-color: #0056b3;
+  background-color: $next-btn-hover;
 }
 
 /* Estilos de resultados */
@@ -267,7 +268,7 @@ h1 {
   display: flex;
   align-items: center;
   padding: 10px;
-  border: 1px solid #007bff;
+  border: 1px solid $next-btn-color;
   border-radius: 10px;
   background-color: #2c2f38;
 }
@@ -288,7 +289,7 @@ h1 {
 button {
   margin-left: 10px;
   background-color: #28a745;
-  color: white;
+  color: $text-color;
   border: none;
   padding: 8px;
   border-radius: 5px;

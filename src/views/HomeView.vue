@@ -123,28 +123,21 @@
   onMounted(fetchFeaturedSongs);
   </script>
 
-  <style scoped>
-  /* Variables de colores */
-  :root {
-    --primary-color: #1DB954; /* Verde estilo Spotify */
-    --secondary-color: #121212; /* Fondo oscuro */
-    --text-color: #ffffff;
-    --card-bg: #222222;
-    --shadow-color: rgba(0, 0, 0, 0.2);
-  }
+  <style lang="scss" scoped>
+  @use '@/assets/styles.scss' as *;
 
   .home-view {
     padding: 20px;
     font-family: 'Inter', sans-serif;
-    background-color: var(--secondary-color);
-    color: var(--text-color);
+    background-color: $secondary-color;
+    color: $text-color;
     text-align: center;
     min-height: 100vh; /* Asegura que la página no se corte */
   }
 
   /* Títulos */
   h2, h3 {
-    color: var(--primary-color);
+    color: $primary-color;
     font-weight: 600;
     margin-bottom: 20px;
   }
@@ -180,8 +173,8 @@
     text-align: center;
     padding: 15px;
     border-radius: 15px;
-    background-color: var(--card-bg);
-    box-shadow: 0 4px 10px var(--shadow-color);
+    background-color: $card-bg;
+    box-shadow: 0 4px 10px $shadow-color;
     transition: transform 0.3s ease;
     display: flex;
     flex-direction: column;
@@ -216,7 +209,7 @@
   }
 
   .carousel-control-prev-icon, .carousel-control-next-icon {
-    background-color: var(--primary-color);
+    background-color: $primary-color;
     border-radius: 50%;
   }
 
@@ -225,13 +218,13 @@
     border: none;
     padding: 10px 15px;
     border-radius: 5px;
-    background-color: var(--primary-color);
+    background-color: $primary-color;
     color: white;
     cursor: pointer;
     transition: background-color 0.3s ease;
   }
 
   button:hover {
-    background-color: #188d41;
+    background-color: $button-hover;
   }
   </style>

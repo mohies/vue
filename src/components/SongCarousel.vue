@@ -63,7 +63,9 @@ onMounted(() => {
 });
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
+@use '@/assets/styles.scss' as *;
+
 .carousel-content {
   height: 500px; /* Mantén una altura consistente */
   display: flex;
