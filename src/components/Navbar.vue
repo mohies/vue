@@ -36,15 +36,22 @@
 </template>
 
 <script setup>
+// Importamos el store de usuario (usado para gestionar el estado del usuario en toda la aplicación)
 import { useUserStore } from '@/stores/user';
 
+// Inicializamos el store del usuario, el cual contiene información sobre el usuario y sus acciones
 const userStore = useUserStore();
+// Extraemos la información del usuario desde el store
 const user = userStore.user;
 
+// Función para manejar el logout (cerrar sesión)
 const logout = () => {
+  // Limpiamos la información del usuario desde el store (reseteamos el estado del usuario)
   userStore.clearUser();
+  // Recargamos la página para reflejar los cambios (por ejemplo, el usuario será redirigido a la pantalla de login)
   location.reload();
 };
+
 </script>
 
 <style lang="scss" scoped>

@@ -8,7 +8,8 @@
         <h3 class="song-title">{{ currentSong?.title || 'No hay canción seleccionada' }}</h3>
         <p class="artist-name">{{ currentSong?.artist.name || 'Selecciona una canción' }}</p>
       </div>
-      <audio ref="audio" :src="currentSong?.preview" @ended="nextSong" @timeupdate="updateProgress" autoplay v-if="currentSong"></audio>
+      <audio ref="audio" :src="currentSong?.preview" @ended="nextSong" @timeupdate="updateProgress" autoplay
+        v-if="currentSong"></audio>
 
       <div class="controls">
         <button class="play-btn" @click="togglePlay" :disabled="!currentSong">
@@ -16,14 +17,8 @@
           <span v-else>▶️</span>
         </button>
 
-        <input
-          type="range"
-          v-model="currentTime"
-          :max="duration"
-          class="progress-bar"
-          @input="seek"
-          :disabled="!currentSong"
-        />
+        <input type="range" v-model="currentTime" :max="duration" class="progress-bar" @input="seek"
+          :disabled="!currentSong" />
 
         <div class="time-display">
           <span>{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
@@ -38,76 +33,81 @@
 </template>
 
 <script setup>
+// Importamos las funciones necesarias de Vue
 import { computed, ref, watch } from 'vue';
+// Importamos el store principal (probablemente para acceder a datos globales)
 import { useMainStore } from '@/stores/stores';
 
+// Obtenemos el store principal y lo guardamos en una constante
 const store = useMainStore();
+
+// Creamos una propiedad computada para obtener la canción actual desde el store
 const currentSong = computed(() => store.getCurrentSong);
 
-// Referencia al elemento audio
+// Referencia al elemento de audio en el DOM
 const audio = ref(null);
 
 // Variables para controlar la reproducción y el tiempo
-const isPlaying = ref(false);
-const currentTime = ref(0);
-const duration = ref(0);
+const isPlaying = ref(false); // Indica si la canción se está reproduciendo
+const currentTime = ref(0); // Guarda el tiempo actual de la canción
+const duration = ref(0); // Guarda la duración total de la canción
 
-// Watcher para escuchar los cambios en la canción y actualizar la duración
+// Watcher para escuchar cambios en la canción actual (currentSong)
 watch(currentSong, (newSong) => {
   if (audio.value) {
-    audio.value.pause(); // Pausamos el audio antes de cambiar de canción
-    audio.value.currentTime = 0; // Reiniciamos el tiempo a 0
+    audio.value.pause(); // Si hay una canción, primero la pausamos
+    audio.value.currentTime = 0; // Reiniciamos el tiempo de la canción a 0
   }
 
   if (newSong) {
-    // Si hay una canción, la configuramos para reproducirla automáticamente
-    duration.value = newSong.duration;
-    isPlaying.value = true; // Reanudamos la reproducción
+    // Si hay una nueva canción, actualizamos la duración y comenzamos la reproducción
+    duration.value = newSong.duration; // Establecemos la duración de la canción
+    isPlaying.value = true; // Indicamos que la canción está reproduciéndose
     setTimeout(() => {
-      audio.value.play(); // Reproducimos la canción después de actualizar el estado
-    }, 100); // Esperamos un poco para evitar errores de sincronización
+      audio.value.play(); // Reproducimos la canción después de un pequeño retraso para evitar errores de sincronización
+    }, 100); // El retraso es de 100ms
   } else {
     isPlaying.value = false; // Si no hay canción, detenemos la reproducción
   }
 });
 
-// Función para reproducir/pausar la canción
+// Función para alternar entre reproducir/pausar la canción
 const togglePlay = () => {
   if (audio.value) {
     if (isPlaying.value) {
-      audio.value.pause();
+      audio.value.pause(); // Si está sonando, la pausamos
     } else {
-      audio.value.play();
+      audio.value.play(); // Si está pausada, la reproducimos
     }
-    isPlaying.value = !isPlaying.value;
+    isPlaying.value = !isPlaying.value; // Cambiamos el estado de reproducción
   }
 };
 
-// Función para actualizar la posición del audio al mover la barra de progreso
+// Función para cambiar la posición del audio cuando movemos la barra de progreso
 const seek = () => {
   if (audio.value) {
-    audio.value.currentTime = currentTime.value;
+    audio.value.currentTime = currentTime.value; // Establecemos el tiempo actual en la barra de progreso
   }
 };
 
-// Actualizar el tiempo actual del audio cada segundo
+// Watcher para actualizar el tiempo actual del audio cada vez que cambia
 watch(() => audio.value?.currentTime, (newTime) => {
-  currentTime.value = newTime;
+  currentTime.value = newTime; // Actualizamos el tiempo actual con el nuevo valor
 });
 
-// Función para actualizar el progreso del audio
+// Función para actualizar el progreso del audio (en tiempo y duración)
 const updateProgress = () => {
   if (audio.value) {
-    currentTime.value = audio.value.currentTime;
-    duration.value = audio.value.duration;
+    currentTime.value = audio.value.currentTime; // Actualizamos el tiempo actual
+    duration.value = audio.value.duration; // Actualizamos la duración total de la canción
   }
 };
 
-// Formato de tiempo (minutos:segundos)
+// Función para formatear el tiempo en formato minutos:segundos
 const formatTime = (time) => {
-  const minutes = Math.floor(time / 60);
-  const seconds = Math.floor(time % 60);
-  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+  const minutes = Math.floor(time / 60); // Obtenemos los minutos
+  const seconds = Math.floor(time % 60); // Obtenemos los segundos
+  return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`; // Devolvemos el tiempo con formato adecuado
 };
 </script>
 

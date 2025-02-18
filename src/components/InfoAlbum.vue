@@ -18,25 +18,36 @@ import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 import { useMainStore } from '@/stores/stores';
 
+// Obtenemos la instancia de la ruta actual
 const route = useRoute();
+
+// Definimos una referencia reactiva para almacenar los datos del álbum
 const album = ref(null);
+
+// Obtenemos la instancia del store principal
 const store = useMainStore();
 
+// Función para obtener los datos del álbum desde la API de Deezer
 const fetchAlbum = async (albumId) => {
   try {
+    // Realizamos una solicitud a la API de Deezer para obtener los datos del álbum
     const response = await fetch(`http://localhost:8080/https://api.deezer.com/album/${albumId}`);
     if (!response.ok) throw new Error('Error al obtener datos del álbum');
     const data = await response.json();
+    // Almacenamos los datos del álbum en la referencia reactiva
     album.value = data;
   } catch (error) {
     console.error('Error:', error);
   }
 };
 
+// Función para reproducir una pista
 const playTrack = (track) => {
+  // Establecemos la pista actual en el store
   store.setCurrentSong(track);
 };
 
+// Cuando el componente se monta, obtenemos los datos del álbum utilizando el ID de la ruta
 onMounted(() => {
   fetchAlbum(route.params.id);
 });

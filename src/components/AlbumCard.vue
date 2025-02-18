@@ -7,6 +7,8 @@
   </template>
   
   <script setup>
+  // Definimos las propiedades que el componente espera recibir
+  // En este caso, esperamos una propiedad llamada 'album' que es un objeto
   defineProps({
     album: Object
   });

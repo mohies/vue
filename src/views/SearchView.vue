@@ -6,6 +6,9 @@
     <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo"
         target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
 
+    <!-- Barra de búsqueda -->
+    <SearchBar @search="handleSearch" />
+
     <!-- Filtro de orden -->
     <div class="search-filters">
       <label>
@@ -17,29 +20,25 @@
       </label>
     </div>
 
-    <!-- Campo de búsqueda de canción -->
-    <div class="search-input">
-      <input type="text" v-model="searchQuery" placeholder="Escribe el nombre de la canción"
-        @keyup.enter="searchSongs" />
-    </div>
-
     <!-- Resultados de la búsqueda -->
     <div class="search-page" v-if="filteredResults.length > 0">
       <h2>Resultados de la Búsqueda</h2>
       <div class="song-list" v-if="filterType === 'songs'">
         <div v-for="song in filteredResults" :key="song.id" class="song-item">
-          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" @click="navigateToInfo('album', song.album.id)" />
+          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover"
+            @click="navigateToInfo('album', song.album.id)" />
           <div class="song-info">
             <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
-            <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em></p>
+            <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em>
+            </p>
           </div>
           <audio ref="audio" :src="song.preview"></audio>
-          
+
           <!-- Botón para añadir a playlist -->
           <button @click="togglePlaylist(song)" :class="{ 'in-playlist': isInPlaylist(song) }">
             {{ isInPlaylist(song) ? 'Quitar de Playlist' : 'Añadir a Playlist' }}
           </button>
-          
+
           <!-- Botón de favoritos -->
           <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
             {{ isFavorite(song) ? '❤️ Quitar de Favoritos' : '🤍 Añadir a Favoritos' }}
@@ -51,14 +50,17 @@
       </div>
       <div class="album-cards" v-if="filterType === 'albums'">
         <div v-for="album in filteredResults" :key="album.id" class="album-card">
-          <img :src="album.cover_medium" alt="Album cover" class="album-cover" @click="navigateToInfo('album', album.id)" />
+          <img :src="album.cover_medium" alt="Album cover" class="album-cover"
+            @click="navigateToInfo('album', album.id)" />
           <p><strong @click="navigateToInfo('album', album.id)" class="hover-underline">{{ album.title }}</strong></p>
-          <p><em @click="navigateToInfo('artist', album.artist.id)" class="hover-underline">{{ album.artist.name }}</em></p>
+          <p><em @click="navigateToInfo('artist', album.artist.id)" class="hover-underline">{{ album.artist.name }}</em>
+          </p>
         </div>
       </div>
       <div class="artist-cards" v-if="filterType === 'artists'">
         <div v-for="artist in filteredResults" :key="artist.id" class="artist-card">
-          <img :src="artist.picture_medium" alt="Artist image" class="artist-image" @click="navigateToInfo('artist', artist.id)" />
+          <img :src="artist.picture_medium" alt="Artist image" class="artist-image"
+            @click="navigateToInfo('artist', artist.id)" />
           <p><strong @click="navigateToInfo('artist', artist.id)" class="hover-underline">{{ artist.name }}</strong></p>
         </div>
       </div>
@@ -69,7 +71,8 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
-import { useMainStore } from '@/stores/stores'; 
+import { useMainStore } from '@/stores/stores';
+import SearchBar from '@/components/SearchBar.vue'; // Importa el componente SearchBar
 
 const searchQuery = ref('');
 const sortAscending = ref(false);
@@ -174,6 +177,12 @@ const playSong = (song) => {
       nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
     };
   }
+};
+
+// Función para manejar la búsqueda desde el componente SearchBar
+const handleSearch = (query) => {
+  searchQuery.value = query;
+  searchSongs();
 };
 
 // Actualizar la búsqueda cuando cambie la ruta
