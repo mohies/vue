@@ -31,8 +31,8 @@ const routes = [
     path: '/info/:type/:id',
     name: 'Info',
     component: InfoView,
-    props: true,
   },
+  
 ];
 
 const router = createRouter({

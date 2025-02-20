@@ -1,100 +1,147 @@
 <template>
   <div class="song-card">
-    <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
+    <!-- Imagen del álbum, al hacer clic redirige a la página del álbum -->
+    <img :src="song.album.cover_xl" alt="Album cover" class="album-cover" @click="navigateToInfo('album', song.album.id)" />
     <div class="song-info">
-      <p class="song-title"><strong>{{ song.title }}</strong></p>
-      <p class="song-artist"><em>{{ song.artist.name }}</em></p>
+      <!-- Título de la canción, al hacer clic redirige a la página de la canción -->
+      <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
+      <!-- Artista de la canción, al hacer clic redirige a la página del artista -->
+      <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em></p>
     </div>
-    <audio :src="song.preview" controls class="audio-player" />
-
-    <div class="buttons">
-      <button @click="$emit('add-to-playlist', song)" class="add-to-playlist">Añadir a Playlist</button>
-      <button @click="$emit('toggle-favorite', song)" :class="{ favorite: isFavorite }">
-        {{ isFavorite ? '❤️' : '🤍' }} Favorito
+    <div class="button-container">
+      <!-- Botón para añadir o quitar de la playlist -->
+      <button @click="togglePlaylist(song)" :class="{ 'in-playlist': isInPlaylist(song) }">
+        {{ isInPlaylist(song) ? 'Quitar de Playlist' : 'Añadir a Playlist' }}
       </button>
+      <!-- Botón para añadir o quitar de favoritos -->
+      <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
+        {{ isFavorite(song) ? '❤️ Quitar de Favoritos' : '🤍 Añadir a Favoritos' }}
+      </button>
+      <!-- Botón para reproducir la canción -->
+      <button @click="playSong(song)">Reproducir</button>
     </div>
   </div>
 </template>
 
 <script setup>
-defineProps({
-  song: Object,
-  isFavorite: Boolean
+import { defineProps } from 'vue';
+import { useRouter } from 'vue-router'; // Importamos useRouter para la navegación
+import { useMainStore } from '@/stores/stores'; // Importamos el store para gestionar la lista de reproducción y favoritos
+
+// Definimos las propiedades
+const props = defineProps({
+  song: Object
 });
-defineEmits(['toggle-favorite', 'add-to-playlist']);
+
+const store = useMainStore(); // Instanciamos el store
+const router = useRouter(); // Instanciamos el router
+
+// Función para navegar a la información de canción, artista o álbum
+const navigateToInfo = (type, id) => {
+  router.push({ name: 'Info', params: { type, id } });
+};
+
+// Función para agregar o quitar la canción de la lista de reproducción
+const togglePlaylist = (song) => {
+  if (isInPlaylist(song)) {
+    store.removeSongFromPlaylist(song.id);
+  } else {
+    store.addSongToPlaylist(song);
+  }
+};
+
+// Función para verificar si la canción está en la lista de reproducción
+const isInPlaylist = (song) => {
+  return store.getPlaylist.songs.some(s => s.id === song.id);
+};
+
+// Función para agregar o quitar la canción de los favoritos
+const toggleFavorite = (song) => {
+  if (isFavorite(song)) {
+    store.removeFromFavorites(song.id);
+  } else {
+    store.addToFavorites(song);
+  }
+};
+
+// Función para verificar si la canción está en los favoritos
+const isFavorite = (song) => {
+  return store.favorites.some(fav => fav.id === song.id);
+};
+
+// Función para reproducir la canción
+const playSong = (song) => {
+  store.setCurrentSong(song);
+  const audio = new Audio(song.preview);
+  audio.play();
+};
 </script>
 
 <style scoped>
 .song-card {
-  background-color: #333;
-  border-radius: 10px;
-  padding: 20px;
-  width: 250px;
-  text-align: center;
+  display: flex;
+  align-items: center;
+  gap: 20px; /* Espacio mayor entre la imagen y los detalles */
+  background-color: #1f1f1f; /* Fondo oscuro para la tarjeta */
+  padding: 15px;
+  border-radius: 10px; /* Esquinas redondeadas */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Sombra sutil */
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+  width: 100%; /* Que ocupe el 100% del contenedor */
 }
 
 .song-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+  transform: translateY(-5px); /* Efecto hover para levantar la tarjeta */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Sombra más intensa en hover */
 }
 
 .album-cover {
-  width: 100%;
-  border-radius: 5px;
-  margin-bottom: 10px;
-  transition: opacity 0.3s ease;
+  width: 90px; /* Tamaño de la imagen más grande */
+  height: 90px;
+  border-radius: 5px; /* Esquinas redondeadas para la imagen */
+  object-fit: cover; /* Ajuste de la imagen */
 }
 
 .song-info {
-  margin-bottom: 10px;
-}
-
-.song-title {
-  color: #f1f1f1;
-  font-size: 1.2rem;
-}
-
-.song-artist {
-  color: #ccc;
-  font-size: 1rem;
-}
-
-.audio-player {
-  width: 100%;
-  margin-top: 10px;
-  border-radius: 5px;
-  background-color: #222;
-}
-
-.buttons {
   display: flex;
-  justify-content: space-between;
-  margin-top: 15px;
+  flex-direction: column;
+  justify-content: center; /* Centra el texto verticalmente */
+  flex: 1; /* La columna de información ocupará el espacio restante */
+}
+
+.song-info p {
+  margin: 5px 0; /* Espacio entre los elementos de información */
+}
+
+.song-info p strong {
+  font-size: 1.1rem;
+  color: #fff;
+  font-weight: bold;
+}
+
+.song-info p em {
+  font-size: 0.9rem;
+  color: #bbb;
+}
+
+.button-container {
+  display: flex;
+  gap: 15px; /* Espacio entre los botones */
+  margin-left: auto; /* Esto hará que los botones se alineen a la derecha */
+  justify-content: flex-end; /* Alinea los botones a la derecha */
 }
 
 button {
-  background-color: #007bff;
+  padding: 8px 15px;
+  background-color: #1DB954;
   color: white;
   border: none;
-  padding: 8px 15px;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
   font-size: 0.9rem;
 }
 
 button:hover {
-  background-color: #0056b3;
-  transform: scale(1.05);
-}
-
-.favorite {
-  background-color: #dc3545;
-}
-
-.favorite:hover {
-  background-color: #c82333;
+  background-color: #188d41;
 }
 </style>

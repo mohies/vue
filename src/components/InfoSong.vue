@@ -2,7 +2,11 @@
   <div class="info-song" v-if="song">
     <h2>{{ song.title }}</h2>
     <img v-if="song.album && song.album.cover_xl" :src="song.album.cover_xl" alt="Album Cover" class="album-cover" />
-    <p v-if="song.artist">Artista: {{ song.artist.name }}</p>
+    <p v-if="song.artist">
+      Artista: 
+      <!-- Hacemos clic en el nombre del artista para ir a la página del artista -->
+      <span @click="navigateToArtist(song.artist.id)" class="hover-underline">{{ song.artist.name }}</span>
+    </p>
     <p v-if="song.album">Álbum: {{ song.album.title }}</p>
     <button @click="playSong">Reproducir</button>
   </div>
@@ -10,13 +14,15 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router'; // Importamos el router
 import { useMainStore } from '@/stores/stores';
 
 const route = useRoute();
+const router = useRouter(); // Usamos el router
 const song = ref(null);
 const store = useMainStore();
 
+// Función para obtener la canción desde la API
 const fetchSong = async (songId) => {
   try {
     const response = await fetch(`http://localhost:8080/https://api.deezer.com/track/${songId}`);
@@ -28,10 +34,17 @@ const fetchSong = async (songId) => {
   }
 };
 
+// Función para reproducir la canción
 const playSong = () => {
   store.setCurrentSong(song.value);
 };
 
+// Función para navegar al perfil del artista
+const navigateToArtist = (artistId) => {
+  router.push({ name: 'Info', params: { type: 'artist', id: artistId } });
+};
+
+// Al montar el componente, obtenemos los detalles de la canción
 onMounted(() => {
   fetchSong(route.params.id);
 });
@@ -59,5 +72,15 @@ button {
 button:hover {
   background-color: #218838;
   transform: scale(1.05);
+}
+
+/* Estilo para el nombre del artista cuando pasa el mouse por encima */
+.hover-underline {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.hover-underline:hover {
+  color: #1DB954; /* Cambia el color al pasar el mouse */
 }
 </style>
