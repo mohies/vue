@@ -1,5 +1,5 @@
 <template>
-  <nav class="sidebar">
+  <nav class="navbar">
     <div class="container">
       <!-- Logo de Deezer -->
       <img class="logo" src="../imgs/Deezer.png" alt="Deezer Logo" />
@@ -51,13 +51,12 @@ const logout = () => {
   // Recargamos la página para reflejar los cambios (por ejemplo, el usuario será redirigido a la pantalla de login)
   location.reload();
 };
-
 </script>
 
 <style lang="scss" scoped>
 @use '@/assets/styles.scss' as *;
 
-.sidebar {
+.navbar {
   position: fixed;
   left: 0;
   top: 0;
@@ -70,15 +69,20 @@ const logout = () => {
   justify-content: space-between;
   padding: 20px;
   align-items: center;
+  z-index: 1000; /* Asegura que la barra de navegación esté por encima de otros elementos */
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
 }
 
 /* Logo de Deezer */
 .logo {
   width: 150px; /* Ajusta el tamaño del logo */
   margin-bottom: 20px;
-  display: block; /* Esto asegura que el logo sea un bloque para centrarlo */
-  margin-left: auto; /* Centra el logo */
-  margin-right: auto; /* Centra el logo */
 }
 
 /* Nombre de la aplicación */
@@ -88,7 +92,6 @@ const logout = () => {
   color: $primary-color;
   text-decoration: none;
   margin-bottom: 30px;
-  display: block;
 }
 
 /* Estilo de los enlaces */
@@ -142,5 +145,68 @@ const logout = () => {
   height: 50px;
   border-radius: 50%;
   margin-bottom: 10px;
+}
+
+/* Media Queries para hacer la barra de navegación responsive */
+@media (max-width: 768px) {
+  .navbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px; /* Reducimos el padding */
+  }
+
+  .container {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+  }
+
+  .logo {
+    width: 40px; /* Reducimos el tamaño del logo */
+    margin-bottom: 0;
+  }
+
+  .navbar-brand {
+    font-size: 1rem; /* Reducimos el tamaño de la fuente */
+    margin-bottom: 0;
+  }
+
+  .navbar-nav {
+    flex-direction: row;
+    justify-content: center;
+    width: auto;
+  }
+
+  .nav-item {
+    margin-bottom: 0;
+    margin-left: 10px; /* Reducimos el margen entre los elementos */
+  }
+
+  .logout-btn {
+    width: auto;
+    margin-top: 0;
+    padding: 5px 10px; /* Reducimos el padding del botón */
+    font-size: 0.8rem; /* Reducimos el tamaño de la fuente del botón */
+  }
+
+  .user-info {
+    flex-direction: row;
+    align-items: center;
+    margin-bottom: 0;
+  }
+
+  .avatar {
+    width: 30px; /* Reducimos el tamaño del avatar */
+    height: 30px;
+    margin-bottom: 0;
+    margin-right: 5px; /* Reducimos el margen derecho del avatar */
+  }
 }
 </style>

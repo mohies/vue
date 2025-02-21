@@ -1,15 +1,10 @@
 <template>
   <div class="search-container">
-    <!-- Sección de búsqueda -->
     <h1>Buscador</h1>
-    <p>Busca canciones.</p>
+    <p>Busca canciones, álbumes o artistas.</p>
     <p>Para que salgan los resultados debes entrar en <a href="https://cors-anywhere.herokuapp.com/corsdemo"
         target="_blank">https://cors-anywhere.herokuapp.com/corsdemo</a></p>
 
-    <!-- Barra de búsqueda -->
-    <SearchBar @search="handleSearch" />
-
-    <!-- Filtro de orden -->
     <div class="search-filters">
       <label>
         <input type="checkbox" v-model="sortAscending" /> Ordenar Ascendente
@@ -20,59 +15,29 @@
       </label>
     </div>
 
-    <!-- Resultados de la búsqueda -->
-    <div class="search-page" v-if="filteredResults.length > 0">
-      <h2>Resultados de la Búsqueda</h2>
-      <div class="song-list" v-if="filterType === 'songs'">
-        <div v-for="song in filteredResults" :key="song.id" class="song-item">
-          <img :src="song.album.cover_medium" alt="Album cover" class="album-cover"
-            @click="navigateToInfo('album', song.album.id)" />
-          <div class="song-info">
-            <p><strong @click="navigateToInfo('song', song.id)" class="hover-underline">{{ song.title }}</strong></p>
-            <p><em @click="navigateToInfo('artist', song.artist.id)" class="hover-underline">{{ song.artist.name }}</em>
-            </p>
-          </div>
-          <audio ref="audio" :src="song.preview"></audio>
+    <div class="search-input">
+      <input type="text" v-model="searchQuery" placeholder="Escribe lo que quieres buscar..."
+        @keyup.enter="searchSongs" />
+    </div>
 
-          <!-- Botón para añadir a playlist -->
-          <button @click="togglePlaylist(song)" :class="{ 'in-playlist': isInPlaylist(song) }">
-            {{ isInPlaylist(song) ? 'Quitar de Playlist' : 'Añadir a Playlist' }}
-          </button>
+    <div class="filter-buttons">
+      <button @click="filterType = 'songs'" :class="{ active: filterType === 'songs' }">Canciones</button>
+      <button @click="filterType = 'albums'" :class="{ active: filterType === 'albums' }">Álbumes</button>
+      <button @click="filterType = 'artists'" :class="{ active: filterType === 'artists' }">Artistas</button>
+    </div>
 
-          <!-- Botón de favoritos -->
-          <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
-            {{ isFavorite(song) ? '❤️ Quitar de Favoritos' : '🤍 Añadir a Favoritos' }}
-          </button>
+    <SearchResults :results="filteredResults" :filterType="filterType" />
 
-          <!-- Botón para reproducir canción -->
-          <button @click="playSong(song)">Reproducir</button>
-        </div>
-      </div>
-      <div class="album-cards" v-if="filterType === 'albums'">
-        <div v-for="album in filteredResults" :key="album.id" class="album-card">
-          <img :src="album.cover_medium" alt="Album cover" class="album-cover"
-            @click="navigateToInfo('album', album.id)" />
-          <p><strong @click="navigateToInfo('album', album.id)" class="hover-underline">{{ album.title }}</strong></p>
-          <p><em @click="navigateToInfo('artist', album.artist.id)" class="hover-underline">{{ album.artist.name }}</em>
-          </p>
-        </div>
-      </div>
-      <div class="artist-cards" v-if="filterType === 'artists'">
-        <div v-for="artist in filteredResults" :key="artist.id" class="artist-card">
-          <img :src="artist.picture_medium" alt="Artist image" class="artist-image"
-            @click="navigateToInfo('artist', artist.id)" />
-          <p><strong @click="navigateToInfo('artist', artist.id)" class="hover-underline">{{ artist.name }}</strong></p>
-        </div>
-      </div>
+    <div v-if="filteredResults.length === 0 && searchQuery" class="no-results">
+      <p>No se encontraron resultados para "{{ searchQuery }}".</p>
     </div>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
-import { useMainStore } from '@/stores/stores';
-import SearchBar from '@/components/SearchBar.vue'; // Importa el componente SearchBar
+import { useRoute} from 'vue-router';
+import SearchResults from '@/components/SearchResults.vue';
 
 const searchQuery = ref('');
 const sortAscending = ref(false);
@@ -82,18 +47,14 @@ const searchResults = ref({
   albums: [],
   artists: []
 });
-const filterType = ref('songs');
-const store = useMainStore();
-const audio = ref(null); // Definimos la referencia al elemento audio
+const filterType = ref('songs'); 
+
 
 const route = useRoute();
-const router = useRouter();
 
-const navigateToInfo = (type, id) => {
-  router.push({ name: 'Info', params: { type, id } });
-};
 
-// Buscar canciones en Deezer
+
+
 const searchSongs = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value.songs = [];
@@ -102,22 +63,33 @@ const searchSongs = async () => {
     return;
   }
 
-  try {
-    const response = await fetch(
-      `http://localhost:8080/https://api.deezer.com/search?q=${searchQuery.value}`
-    );
-    if (!response.ok) throw new Error('Error al obtener los datos');
-    const data = await response.json();
+  const songUrl = `http://localhost:8080/https://api.deezer.com/search?q=${encodeURIComponent(searchQuery.value)}`;
+  const albumUrl = `http://localhost:8080/https://api.deezer.com/search/album?q=${encodeURIComponent(searchQuery.value)}`;
+  const artistUrl = `http://localhost:8080/https://api.deezer.com/search/artist?q=${encodeURIComponent(searchQuery.value)}`;
 
-    searchResults.value.songs = data.data.filter(item => item.type === 'track');
-    searchResults.value.albums = data.data.filter(item => item.type === 'album');
-    searchResults.value.artists = data.data.filter(item => item.type === 'artist');
+  try {
+    const [songResponse, albumResponse, artistResponse] = await Promise.all([
+      fetch(songUrl),
+      fetch(albumUrl),
+      fetch(artistUrl)
+    ]);
+
+    if (!songResponse.ok || !albumResponse.ok || !artistResponse.ok) {
+      throw new Error("Error al buscar en Deezer");
+    }
+
+    const songData = await songResponse.json();
+    const albumData = await albumResponse.json();
+    const artistData = await artistResponse.json();
+
+    searchResults.value.songs = songData.data || [];
+    searchResults.value.albums = albumData.data || [];
+    searchResults.value.artists = artistData.data || [];
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error en la búsqueda:", error.message);
   }
 };
 
-// Computed para ordenar resultados
 const filteredResults = computed(() => {
   let results = [];
 
@@ -139,53 +111,6 @@ const filteredResults = computed(() => {
   return results;
 });
 
-// Playlist
-const togglePlaylist = (song) => {
-  if (isInPlaylist(song)) {
-    store.removeSongFromPlaylist(song.id);
-  } else {
-    store.addSongToPlaylist(song);
-  }
-};
-
-const isInPlaylist = (song) => {
-  return store.getPlaylist.songs.some(s => s.id === song.id);
-};
-
-// Favoritos
-const toggleFavorite = (song) => {
-  if (isFavorite(song)) {
-    store.removeFromFavorites(song.id);
-  } else {
-    store.addToFavorites(song);
-  }
-};
-
-const isFavorite = (song) => {
-  return store.favorites.some(fav => fav.id === song.id);
-};
-
-// Reproducir canción
-const playSong = (song) => {
-  store.setCurrentSong(song);  // Establece la canción actual en el store
-
-  // Esperamos a que termine la canción para reproducir la siguiente
-  if (audio.value) {
-    audio.value.src = song.preview; // Actualizamos la fuente del audio
-    audio.value.play(); // Reproducimos la canción
-    audio.value.onended = () => {
-      nextSongInSearchResults();  // Reproducir la siguiente canción en la lista de búsqueda
-    };
-  }
-};
-
-// Función para manejar la búsqueda desde el componente SearchBar
-const handleSearch = (query) => {
-  searchQuery.value = query;
-  searchSongs();
-};
-
-// Actualizar la búsqueda cuando cambie la ruta
 watch(() => route.query.q, (newQuery) => {
   if (newQuery) {
     searchQuery.value = newQuery;
@@ -193,172 +118,74 @@ watch(() => route.query.q, (newQuery) => {
   }
 });
 
-// Ejecutar la búsqueda inicial si hay un término de búsqueda en la ruta
 onMounted(() => {
   if (route.query.q) {
     searchQuery.value = route.query.q;
     searchSongs();
   }
 });
-
-console.log("Playlist actual:", store.getPlaylist);
 </script>
-
-<style lang="scss" scoped>
-@use '@/assets/styles.scss' as *;
-
+<style scoped>
 .search-container {
-  background-color: $secondary-color;
-  color: $text-color;
-  padding: 20px;
+  background-color: #1f1f1f;
+  color: #fff;
+  padding: 30px;
+  border-radius: 10px;
 }
 
-/* Estilos de títulos */
 h1 {
-  color: #dc3545;
+  color: #ff4081;
+  font-size: 2rem;
 }
 
-/* Estilos de búsqueda */
 .search-input input {
-  padding: 10px;
+  padding: 12px;
   width: 100%;
-  border-radius: 5px;
-  border: 1px solid #ccc;
+  border-radius: 10px;
+  border: none;
   background-color: #333;
-  color: $text-color;
+  color: white;
+  font-size: 1rem;
 }
 
-/* Filtros */
 .search-filters {
   margin-bottom: 20px;
 }
 
 .search-filters label {
   margin-right: 20px;
-  color: $text-color;
+  color: white;
 }
 
-/* Botones de filtro */
 .filter-buttons {
+  margin-top: 20px; /* Añadimos margen superior para alejar los botones del search bar */
   margin-bottom: 20px;
+  display: flex;
+  gap: 20px; /* Aumentamos el espacio entre los botones */
 }
 
 .filter-buttons button {
-  margin-right: 10px;
+  background-color: #6200ea;
+  color: white;
   padding: 10px 20px;
-  border: none;
   border-radius: 5px;
   cursor: pointer;
-  background-color: $next-btn-color;
-  color: $text-color;
-  transition: background-color 0.3s ease;
+  transition: all 0.3s ease;
+  font-size: 1rem;
 }
 
 .filter-buttons button.active {
-  background-color: $next-btn-hover;
+  background-color: #3700b3;
 }
 
 .filter-buttons button:hover {
-  background-color: $next-btn-hover;
-}
-
-/* Estilos de resultados */
-.song-list,
-.album-cards,
-.artist-cards {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 20px;
-}
-
-.song-item,
-.album-card,
-.artist-card {
-  display: flex;
-  align-items: center;
-  padding: 10px;
-  border: 1px solid $next-btn-color;
-  border-radius: 10px;
-  background-color: #2c2f38;
-}
-
-.song-item img,
-.album-card img,
-.artist-card img {
-  width: 80px;
-  height: 80px;
-  border-radius: 5px;
-  margin-right: 10px;
-}
-
-.song-info {
-  flex-grow: 1;
-}
-
-button {
-  margin-left: 10px;
-  background-color: #28a745;
-  color: $text-color;
-  border: none;
-  padding: 8px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-button:hover {
-  background-color: #218838;
+  background-color: #3700b3;
   transform: scale(1.05);
 }
 
-/* Estilos de favoritos */
-.favorite {
-  background-color: #dc3545 !important;
-}
-
-.favorite:hover {
-  background-color: #c82333 !important;
-}
-
-/* Estilos de playlist */
-.in-playlist {
-  background-color: #ffc107 !important;
-}
-
-.in-playlist:hover {
-  background-color: #e0a800 !important;
-}
-
-.album-cover,
-.artist-image {
-  transition: transform 0.3s ease;
-}
-
-.album-cover:hover,
-.artist-image:hover {
-  transform: scale(1.1);
-}
-
-.hover-underline {
-  cursor: pointer;
-  position: relative;
-}
-
-.hover-underline::after {
-  content: '';
-  position: absolute;
-  width: 100%;
-  height: 2px;
-  background-color: currentColor;
-  bottom: -2px;
-  left: 0;
-  transform: scaleX(0);
-  transform-origin: bottom right;
-  transition: transform 0.25s ease-out;
-}
-
-.hover-underline:hover::after {
-  transform: scaleX(1);
-  transform-origin: bottom left;
+.no-results {
+  color: #ff4081;
+  font-size: 1.2rem;
+  margin-top: 20px;
 }
 </style>

@@ -1,28 +1,12 @@
 <template>
   <div class="playlist-view">
     <h2>Mi Playlist</h2>
-    <div v-for="song in playlist.songs" :key="song.id" class="playlist-song">
-      <img :src="song.album.cover_medium" alt="Album cover" class="album-cover" />
-      <div class="song-info">
-        <p><strong>{{ song.title }}</strong></p>
-        <p><em>{{ song.artist.name }}</em></p>
-      </div>
-      <button @click="playSong(song)">Reproducir</button>
-    </div>
+    <PlaylistManager /> 
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import { useMainStore } from '@/stores/stores';
-import PlaylistManager from '@/components/PlaylistManager.vue';
-
-const store = useMainStore();
-const playlist = computed(() => store.getPlaylist);
-
-const playSong = (song) => {
-  store.setCurrentSong(song);
-};
+import PlaylistManager from '@/components/PlaylistManager.vue'; // Importamos el componente
 </script>
 
 <style scoped>

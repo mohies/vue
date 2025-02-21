@@ -24,9 +24,6 @@
           <span>{{ formatTime(currentTime) }} / {{ formatTime(duration) }}</span>
         </div>
 
-        <button class="next-btn" @click="nextSong" :disabled="!currentSong">
-          ▶️ Siguiente
-        </button>
       </div>
     </div>
   </div>
@@ -53,23 +50,32 @@ const currentTime = ref(0); // Guarda el tiempo actual de la canción
 const duration = ref(0); // Guarda la duración total de la canción
 
 // Watcher para escuchar cambios en la canción actual (currentSong)
+// Observamos la variable `currentSong` y ejecutamos la función cada vez que cambia
 watch(currentSong, (newSong) => {
+  // Si ya hay una canción reproduciéndose (audio.value existe), la pausamos y reiniciamos
   if (audio.value) {
-    audio.value.pause(); // Si hay una canción, primero la pausamos
-    audio.value.currentTime = 0; // Reiniciamos el tiempo de la canción a 0
+    audio.value.pause(); // Pausamos la canción actual si existe
+    audio.value.currentTime = 0; // Reiniciamos la canción al principio (tiempo = 0)
   }
 
+  // Si hay una nueva canción (newSong no es null o undefined)
   if (newSong) {
-    // Si hay una nueva canción, actualizamos la duración y comenzamos la reproducción
-    duration.value = newSong.duration; // Establecemos la duración de la canción
-    isPlaying.value = true; // Indicamos que la canción está reproduciéndose
+    // Actualizamos la duración de la canción
+    duration.value = newSong.duration; // Establecemos la duración de la nueva canción
+    
+    // Indicamos que la canción está comenzando a reproducirse
+    isPlaying.value = true; // Marcamos que la canción está sonando
+
+    // Usamos `setTimeout` para darle un pequeño retraso antes de reproducirla
     setTimeout(() => {
-      audio.value.play(); // Reproducimos la canción después de un pequeño retraso para evitar errores de sincronización
-    }, 100); // El retraso es de 100ms
+      audio.value.play(); // Reproducimos la nueva canción después del retraso
+    }, 100); // 100ms de retraso para evitar problemas de sincronización
   } else {
-    isPlaying.value = false; // Si no hay canción, detenemos la reproducción
+    // Si no hay una nueva canción (newSong es null o undefined), detenemos la reproducción
+    isPlaying.value = false; // Marcamos que la canción no está sonando
   }
 });
+
 
 // Función para alternar entre reproducir/pausar la canción
 const togglePlay = () => {

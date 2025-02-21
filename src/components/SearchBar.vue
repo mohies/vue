@@ -1,7 +1,6 @@
 <template>
   <div class="search-bar">
-    <input type="text" v-model="searchQuery" @keyup.enter="emitSearch"
-      placeholder="Busca canciones, artistas o álbumes" />
+    <input type="text" v-model="searchQuery" @keyup.enter="emitSearch" placeholder="Busca canciones, artistas o álbumes" />
   </div>
 </template>
 

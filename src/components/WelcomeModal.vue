@@ -129,4 +129,35 @@ button {
 button:hover {
   background-color: $button-hover;
 }
+
+/* Media Queries para hacer el modal responsive */
+@media (max-width: 768px) {
+  .modal-content {
+    padding: 20px;
+    width: 95%;
+  }
+
+  .avatar-options {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .avatar-options img {
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .modal-content {
+    padding: 15px;
+  }
+
+  h2 {
+    font-size: 1.2rem;
+  }
+
+  button {
+    padding: 8px 10px;
+  }
+}
 </style>

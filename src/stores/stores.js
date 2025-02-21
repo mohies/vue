@@ -39,9 +39,7 @@ export const useMainStore = defineStore('main', {
       this.playlist.songs = this.playlist.songs.filter(song => song.id !== songId);
     },
 
-    reorderSongsInPlaylist(newOrder) {
-      this.playlist.songs = newOrder;
-    },
+
   },
 
   getters: {

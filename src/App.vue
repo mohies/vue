@@ -30,7 +30,7 @@ watch(() => userStore.user.name, (newName) => {
         </main>
 
         <footer class="footer">
-          <p>&copy; 2024 Deezer Music Client. Todos los derechos reservados.</p>
+          <p>&copy; 2025 Deezer Music Client. Todos los derechos reservados.</p>
         </footer>
       </div>
     </div>
@@ -120,5 +120,58 @@ watch(() => userStore.user.name, (newName) => {
   left: 50%;
   transform: translateX(-50%);
   z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+}
+
+/* Media Queries para hacer la aplicación responsive */
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+    margin-top: 50px; /* Ajusta el margen superior para la barra de navegación responsive */
+  }
+
+  .sidebar {
+    width: 100%;
+    height: auto;
+    position: fixed;
+    top: 0;
+    left: 0;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 10px; /* Reducimos el padding */
+  }
+
+  .main-content {
+    margin-left: 0;
+    margin-top: 50px; /* Ajusta el margen superior para la barra de navegación responsive */
+  }
+
+  .header {
+    font-size: 1.2rem;
+    padding: 10px;
+  }
+
+  .content {
+    padding: 10px;
+  }
+
+  .footer {
+    font-size: 0.8rem;
+    padding: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    font-size: 1rem;
+  }
+
+  .content {
+    padding: 5px;
+  }
+
+  .footer {
+    font-size: 0.7rem;
+  }
 }
 </style>

@@ -1,120 +1,145 @@
 <template>
-  <div class="search-results">
-    <h2>Resultados</h2>
-    
-    <h3>Canciones</h3>
-    <div class="song-cards">
-      <SongCard 
-        v-for="song in songs" 
-        :key="song.id" 
-        :song="song" 
-        :isFavorite="favorites.some(fav => fav.id === song.id)"
-        @toggle-favorite="$emit('toggle-favorite', song)"
-        @add-to-playlist="$emit('add-to-playlist', song)"
-      />
+  <div class="search-page">
+    <h2>Resultados de la Búsqueda</h2>
+
+    <div v-if="filterType === 'songs'" class="results-list">
+      <div v-for="song in results" :key="song.id" class="song-item">
+        <SongCard :song="song" />
+      </div>
     </div>
 
-    <h3>Álbumes</h3>
-    <div class="album-cards">
-      <AlbumCard v-for="album in albums" :key="album.id" :album="album" />
+    <div v-if="filterType === 'albums'" class="results-list">
+      <div v-for="album in results" :key="album.id" class="album-item">
+        <AlbumCard :album="album" />
+      </div>
     </div>
 
-    <h3>Artistas</h3>
-    <div class="artist-cards">
-      <ArtistCard v-for="artist in artists" :key="artist.id" :artist="artist" />
+    <div v-if="filterType === 'artists'" class="results-list">
+      <div v-for="artist in results" :key="artist.id" class="artist-item">
+        <ArtistCard :artist="artist" />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
-import SongCard from './SongCard.vue';
-import AlbumCard from './AlbumCard.vue';
-import ArtistCard from './ArtistCard.vue';
+import { defineProps } from 'vue';
+import SongCard from '@/components/SongCard.vue';
+import AlbumCard from '@/components/AlbumCard.vue';
+import ArtistCard from '@/components/ArtistCard.vue';
 
-const props = defineProps({
-  results: Array,
-  favorites: Array
+defineProps({ //es la forma de definir las propiedades que el componente espera recibir
+  results: Array, // Array de resultados de la búsqueda
+  filterType: String // Tipo de filtro (canciones, álbumes, artistas)
 });
-
-const songs = computed(() => props.results.filter(item => item.type === 'track'));
-const albums = computed(() => props.results.filter(item => item.type === 'album'));
-const artists = computed(() => props.results.filter(item => item.type === 'artist'));
-
-defineEmits(['toggle-favorite', 'add-to-playlist']);
 </script>
 
 <style scoped>
-.search-results {
+.search-page {
+  background-color: #121212;
+  /* Fondo oscuro para la página */
   padding: 20px;
+  color: #fff;
 }
 
-h3 {
-  margin-top: 20px;
-  color: white;
-  font-size: 1.2rem;
-  margin-bottom: 10px;
+h2 {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
+  color: #fff;
 }
 
-/* Contenedores flexibles para los tipos de resultados */
-.song-cards,
-.album-cards,
-.artist-cards {
+.results-list {
   display: flex;
-  flex-wrap: wrap;  /* Asegura que los elementos se ajusten a varias filas si no caben en una */
-  gap: 15px; /* Espacio entre los elementos */
-  justify-content: flex-start;  /* Alinea los elementos a la izquierda */
+  flex-direction: column;
+  /* Asegura que las canciones se apilen verticalmente */
+  gap: 15px;
+  /* Espacio entre cada tarjeta */
 }
 
-/* Ajustamos el tamaño y espaciado de cada tarjeta */
-.song-card,
-.album-card,
-.artist-card {
-  flex: 1 1 200px; /* Esto hace que las tarjetas tengan un tamaño flexible con un mínimo de 200px */
-  max-width: 250px; /* Controla el ancho máximo de cada tarjeta */
-}
-
-/* Estilos para las tarjetas (canción, álbum, artista) */
-.song-card,
-.album-card,
-.artist-card {
-  background-color: #2c2f38;
-  border-radius: 10px;
-  padding: 10px 15px; /* Padding reducido */
-  color: white;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+.song-item,
+.album-item,
+.artist-item {
   display: flex;
-  flex-direction: column;  /* Asegura que los elementos dentro de la tarjeta estén alineados en columna */
-  justify-content: flex-start;  /* Distribuye el espacio en la parte superior de la tarjeta */
-  height: 200px; /* Fija una altura para las tarjetas */
-  gap: 5px; /* Agrega un pequeño espacio entre los elementos */
-}
-
-/* Hacemos que las canciones no estén separadas en exceso */
-.song-card img {
+  /* Usa flexbox para que los elementos se alineen en una fila */
   width: 100%;
-  height: auto;
-  max-height: 80px; /* Limita la altura de la imagen */
-  object-fit: cover;
-  margin-bottom: 5px; /* Reducimos el margen debajo de la imagen */
+  /* Hace que las tarjetas ocupen el 100% del ancho disponible */
+  align-items: center;
+  /* Centra los elementos verticalmente */
+  gap: 15px;
+  /* Espacio entre la imagen y los detalles */
+  margin-bottom: 15px;
+  /* Espacio entre cada tarjeta */
 }
 
-/* Ajustes de estilo para el nombre de la canción */
-.song-card p {
-  margin: 0;
-  padding: 0;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  overflow: hidden;
-  font-size: 0.9rem; /* Ajustamos el tamaño del texto */
-  flex-grow: 1; /* Hace que el texto ocupe el espacio restante en la tarjeta */
-  margin-bottom: 5px; /* Reducimos el margen debajo del nombre de la canción */
+.song-card,
+.album-card,
+.artist-card {
+  display: flex;
+  /* Usamos flexbox para los elementos dentro de la tarjeta */
+  width: 100%;
+  /* Cada tarjeta ocupa el 100% de su contenedor */
+  gap: 15px;
+  /* Espacio entre la imagen y los detalles */
+  align-items: center;
+  /* Centra los elementos verticalmente */
 }
 
-.song-card:hover,
-.album-card:hover,
-.artist-card:hover {
+.song-card .album-cover,
+.album-card .album-cover,
+.artist-card .album-cover {
+  width: 50px;
+  /* Tamaño reducido de la imagen */
+  height: 50px;
+  /* Mantener altura proporcional */
+  border-radius: 5px;
+  /* Esquinas redondeadas para la imagen */
+}
+
+.song-details,
+.album-details,
+.artist-details {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  /* Esto hace que los detalles ocupen el espacio restante */
+  align-items: flex-start;
+}
+
+.song-item .song-card:hover,
+.album-item .album-card:hover,
+.artist-item .artist-card:hover {
   transform: translateY(-5px);
-  transition: transform 0.3s ease-in-out;
+  /* Efecto hover para que la tarjeta suba */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+  /* Efecto sombra en hover */
+}
+
+@media (max-width: 768px) {
+
+  .song-item,
+  .album-item,
+  .artist-item {
+    flex-direction: column;
+    /* En pantallas más pequeñas, apilamos los elementos */
+    align-items: center;
+  }
+
+  .song-card .album-cover,
+  .album-card .album-cover,
+  .artist-card .album-cover {
+    width: 50px;
+    /* En pantallas pequeñas, mantengo el tamaño reducido */
+    height: 50px;
+    /* Mantengo la relación de aspecto de la imagen */
+    margin-bottom: 10px;
+  }
+
+  .song-details,
+  .album-details,
+  .artist-details {
+    align-items: center;
+    /* Centrar detalles cuando está en columna */
+    text-align: center;
+  }
 }
 </style>
