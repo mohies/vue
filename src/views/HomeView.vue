@@ -3,24 +3,8 @@
     <!-- Barra de búsqueda -->
     <SearchBar @search="handleSearch" />
 
-    <!-- Resultados de la búsqueda -->
-    <section v-if="searchResults.length > 0" class="search-results">
-      <h2>Resultados de Búsqueda</h2>
-      <div class="song-grid">
-        <div v-for="song in searchResults" :key="song.id" class="song-card">
-          <p><strong>{{ song.title }}</strong></p>
-          <img :src="song.album.cover_xl" alt="Portada del álbum" class="album-image"
-            @click="navigateToAlbum(song.album.id)" />
-          <!-- Reproductor de audio sin controles -->
-          <audio :src="song.preview"></audio>
-          <!-- Botón para reproducir la canción -->
-          <button @click="playSong(song)">Reproducir</button>
-        </div>
-      </div>
-    </section>
-
     <!-- Carrusel de canciones destacadas -->
-    <section v-else-if="featuredSongs.length > 0" class="featured-carousel">
+    <section v-if="featuredSongs.length > 0" class="featured-carousel">
       <h2>Canciones Destacadas</h2>
       <SongCarousel :songs="featuredSongs" />
 
@@ -60,26 +44,21 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRoute, useRouter } from 'vue-router'; // Para gestionar las rutas
 import SearchBar from '@/components/SearchBar.vue';
 import SongCarousel from '@/components/SongCarousel.vue';
 import { useMainStore } from '@/stores/stores'; // Asegúrate de importar el store de Pinia
-import { useUserStore } from '@/stores/user';
 
 // Datos reactivos
 const featuredSongs = ref([]);
 const gridSongs = ref([]);
-const searchResults = ref([]); // Resultados de búsqueda
 
 // Obtener la ruta actual
-const route = useRoute();
 const router = useRouter();
 
 // Obtener el store
 const mainStore = useMainStore();
-
-
 
 // Función para obtener canciones destacadas
 const fetchFeaturedSongs = async () => {
@@ -115,13 +94,6 @@ const navigateToAlbum = (albumId) => {
   router.push({ name: 'Info', params: { type: 'album', id: albumId } });
 };
 
-// Limpiar los resultados de búsqueda al navegar
-watch(() => route.path, (newPath) => {
-  if (newPath === '/') {
-    searchResults.value = []; // Limpiar los resultados al navegar a Home
-  }
-});
-
 // Llamar a la función al montar el componente
 onMounted(fetchFeaturedSongs);
 </script>
@@ -149,8 +121,7 @@ h3 {
 
 /* Contenedor de canciones destacadas */
 .featured-carousel,
-.featured-grid,
-.search-results {
+.featured-grid {
   margin-bottom: 40px;
   padding: 20px;
   display: flex;
@@ -170,6 +141,33 @@ h3 {
 
 /* Grid para canciones pequeñas */
 .song-grid-small {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+
+/* Tarjetas */
+.song-card,
+.song-card-small {
+  text-align: center;
+  padding: 15px;
+  border-radius: 15px;
+  background-color: $card-bg;
+  box-shadow: 0 4px 10px $shadow-color;
+  transition: transform 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 320px;
+}
+
+.song-card:hover {
+  transform: scale(1.05);
+}
+
+/* Imágenes */
+.album-image {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;

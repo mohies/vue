@@ -18,7 +18,8 @@ import { storeToRefs } from 'pinia';
 import PlaylistItem from '@/components/PlaylistItem.vue';
 
 const store = useMainStore();
-const { playlist } = storeToRefs(store);
+const { playlist } = storeToRefs(store);//Esto hace que los elemenos de la playlist puedan ser reactivos y se puedan usar en la template
+
 </script>
 
 <style scoped>

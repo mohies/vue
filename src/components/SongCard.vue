@@ -10,11 +10,11 @@
     </div>
     <div class="button-container">
       <!-- Botón para añadir o quitar de la playlist -->
-      <button @click="togglePlaylist(song)" :class="{ 'in-playlist': isInPlaylist(song) }">
+      <button @click="alternarListaReproducción(song)" >
         {{ isInPlaylist(song) ? 'Quitar de Playlist' : 'Añadir a Playlist' }}
       </button>
       <!-- Botón para añadir o quitar de favoritos -->
-      <button @click="toggleFavorite(song)" :class="{ favorite: isFavorite(song) }">
+      <button @click="alternaFavoritos(song)" >
         {{ isFavorite(song) ? '❤️ Quitar de Favoritos' : '🤍 Añadir a Favoritos' }}
       </button>
       <!-- Botón para reproducir la canción -->
@@ -42,7 +42,7 @@ const navigateToInfo = (type, id) => {
 };
 
 // Función para agregar o quitar la canción de la lista de reproducción
-const togglePlaylist = (song) => {
+const alternarListaReproducción = (song) => {
   if (isInPlaylist(song)) {
     store.removeSongFromPlaylist(song.id);
   } else {
@@ -56,7 +56,7 @@ const isInPlaylist = (song) => {
 };
 
 // Función para agregar o quitar la canción de los favoritos
-const toggleFavorite = (song) => {
+const alternaFavoritos = (song) => {
   if (isFavorite(song)) {
     store.removeFromFavorites(song.id);
   } else {
@@ -64,9 +64,9 @@ const toggleFavorite = (song) => {
   }
 };
 
-// Función para verificar si la canción está en los favoritos
+// Función para verificar si la canción está en los favoritos comprobando si el id de la canción está en la lista de favoritos
 const isFavorite = (song) => {
-  return store.favorites.some(fav => fav.id === song.id);
+  return store.favorites.some(fav => fav.id === song.id); 
 };
 
 // Función para reproducir la canción

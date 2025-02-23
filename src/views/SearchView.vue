@@ -47,19 +47,23 @@ const searchResults = ref({
   albums: [],
   artists: []
 });
+const originalResults = ref({
+  songs: [],
+  albums: [],
+  artists: []
+});
 const filterType = ref('songs'); 
 
-
 const route = useRoute();
-
-
-
 
 const searchSongs = async () => {
   if (!searchQuery.value.trim()) {
     searchResults.value.songs = [];
     searchResults.value.albums = [];
     searchResults.value.artists = [];
+    originalResults.value.songs = [];
+    originalResults.value.albums = [];
+    originalResults.value.artists = [];
     return;
   }
 
@@ -85,6 +89,9 @@ const searchSongs = async () => {
     searchResults.value.songs = songData.data || [];
     searchResults.value.albums = albumData.data || [];
     searchResults.value.artists = artistData.data || [];
+    originalResults.value.songs = [...searchResults.value.songs];
+    originalResults.value.albums = [...searchResults.value.albums];
+    originalResults.value.artists = [...searchResults.value.artists];
   } catch (error) {
     console.error("Error en la búsqueda:", error.message);
   }
@@ -105,7 +112,9 @@ const filteredResults = computed(() => {
   }
 
   if (sortAscending.value) {
-    results = results.sort((a, b) => a.title.localeCompare(b.title));
+    results = [...results].sort((a, b) => a.title.localeCompare(b.title));
+  } else {
+    results = originalResults.value[filterType.value];
   }
 
   return results;
@@ -131,6 +140,7 @@ onMounted(() => {
   color: #fff;
   padding: 30px;
   border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 h1 {
@@ -158,10 +168,9 @@ h1 {
 }
 
 .filter-buttons {
-  margin-top: 20px; /* Añadimos margen superior para alejar los botones del search bar */
   margin-bottom: 20px;
   display: flex;
-  gap: 20px; /* Aumentamos el espacio entre los botones */
+  gap: 15px;
 }
 
 .filter-buttons button {

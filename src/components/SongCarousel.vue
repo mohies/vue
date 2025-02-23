@@ -1,12 +1,7 @@
 <template>
   <div id="song-carousel" class="carousel slide" data-bs-ride="carousel">
     <div class="carousel-inner">
-      <div
-        class="carousel-item"
-        :class="{ active: index === 0 }"
-        v-for="(song, index) in songs"
-        :key="song.id"
-      >
+      <div class="carousel-item" :class="{ active: index === 0 }" v-for="(song, index) in songs" :key="song.id">
         <div class="carousel-content">
           <img :src="song.album.cover_xl" class="d-block w-100 carousel-image" alt="Song Cover" />
           <div class="carousel-caption d-none d-md-block">
@@ -18,21 +13,11 @@
     </div>
 
     <!-- Controles del carrusel -->
-    <button
-      class="carousel-control-prev"
-      type="button"
-      data-bs-target="#song-carousel"
-      data-bs-slide="prev"
-    >
+    <button class="carousel-control-prev" type="button" data-bs-target="#song-carousel" data-bs-slide="prev">
       <span class="carousel-control-prev-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Anterior</span>
     </button>
-    <button
-      class="carousel-control-next"
-      type="button"
-      data-bs-target="#song-carousel"
-      data-bs-slide="next"
-    >
+    <button class="carousel-control-next" type="button" data-bs-target="#song-carousel" data-bs-slide="next">
       <span class="carousel-control-next-icon" aria-hidden="true"></span>
       <span class="visually-hidden">Siguiente</span>
     </button>
@@ -67,7 +52,8 @@ onMounted(() => {
 @use '@/assets/styles.scss' as *;
 
 .carousel-content {
-  height: 500px; /* Mantén una altura consistente */
+  height: 500px;
+  /* Mantén una altura consistente */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -75,13 +61,16 @@ onMounted(() => {
 
 .carousel-content img {
   border-radius: 15px;
-  max-height: 100%; /* Limita la altura máxima */
-  object-fit: cover; /* Ajusta la imagen sin deformarla */
+  max-height: 100%;
+  /* Limita la altura máxima */
+  object-fit: cover;
+  /* Ajusta la imagen sin deformarla */
 }
 
 .carousel-image {
   width: 100%;
-  height: 100%; /* Mantén una altura consistente */
+  height: 100%;
+  /* Mantén una altura consistente */
   object-fit: cover;
 }
 

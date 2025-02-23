@@ -10,7 +10,8 @@
         <div class="form-group">
           <label>Elige un avatar:</label>
           <div class="avatar-options">
-            <img v-for="(avatar, index) in avatars" :key="index" :src="avatar" :alt="'Avatar ' + (index + 1)" @click="selectAvatar(avatar)" :class="{ selected: selectedAvatar === avatar }" />
+            <img v-for="(avatar, index) in avatars" :key="index" :src="avatar" :alt="'Avatar ' + (index + 1)"
+              @click="selectAvatar(avatar)" :class="{ selected: selectedAvatar === avatar }" />
           </div>
         </div>
         <button type="submit">Iniciar Sesión</button>
@@ -59,7 +60,8 @@ const saveUser = () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 10000; /* Ensure it is above other elements */
+  z-index: 10000;
+  /* Ensure it is above other elements */
 }
 
 .modal-content {
@@ -70,7 +72,8 @@ const saveUser = () => {
   color: $text-color;
   width: 90%;
   max-width: 400px;
-  z-index: 10001; /* Ensure it is above the carousel arrows */
+  z-index: 10001;
+  /* Ensure it is above the carousel arrows */
 }
 
 h2 {

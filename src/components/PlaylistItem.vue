@@ -35,7 +35,7 @@ const props = defineProps({
   }
 });
 
-const store = useMainStore();
+const store = useMainStore(); // Instanciamos el store de la aplicación para gestionar la lista de reproducción 
 const router = useRouter(); // Instanciamos el router
 
 // Función para navegar a la información de canción, artista o álbum
