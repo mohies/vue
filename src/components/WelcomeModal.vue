@@ -2,7 +2,7 @@
   <div class="modal-overlay">
     <div class="modal-content">
       <h2>Iniciar Sesión</h2>
-      <form @submit.prevent="saveUser">
+      <form @submit="saveUser">
         <div class="form-group">
           <label for="username">Nombre:</label>
           <input type="text" id="username" v-model="username" required />
@@ -10,7 +10,7 @@
         <div class="form-group">
           <label>Elige un avatar:</label>
           <div class="avatar-options">
-            <img v-for="(avatar, index) in avatars" :key="index" :src="avatar" :alt="'Avatar ' + (index + 1)"
+            <img v-for="(avatar) in avatars" :key="index" :src="avatar"
               @click="selectAvatar(avatar)" :class="{ selected: selectedAvatar === avatar }" />
           </div>
         </div>

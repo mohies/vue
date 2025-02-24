@@ -13,7 +13,7 @@ const searchQuery = ref('');
 // Emitir el término de búsqueda
 const emitSearch = () => {
   if (searchQuery.value.trim()) {
-    emit('search', searchQuery.value); // Emitir búsqueda
+    emit('search', searchQuery.value); // Emitir búsqueda con el término actual y el evento "search" hacia el componente padre
   }
 };
 </script>

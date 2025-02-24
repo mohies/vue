@@ -16,8 +16,7 @@
     </div>
 
     <div class="search-input">
-      <input type="text" v-model="searchQuery" placeholder="Escribe lo que quieres buscar..."
-        @keyup.enter="searchSongs" />
+      <SearchBar @search="handleSearch" />
     </div>
 
     <div class="filter-buttons">
@@ -36,7 +35,8 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute} from 'vue-router';
+import { useRoute } from 'vue-router';
+import SearchBar from '@/components/SearchBar.vue';
 import SearchResults from '@/components/SearchResults.vue';
 
 const searchQuery = ref('');
@@ -120,6 +120,11 @@ const filteredResults = computed(() => {
   return results;
 });
 
+const handleSearch = (query) => {
+  searchQuery.value = query;
+  searchSongs();
+};
+//el watch para que se actualice la búsqueda cuando cambie la query en la URL
 watch(() => route.query.q, (newQuery) => {
   if (newQuery) {
     searchQuery.value = newQuery;
