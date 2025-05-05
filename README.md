@@ -27,3 +27,34 @@ npm run dev
 ```sh
 npm run build
 ```
+
+
+# Local Proxy for the Deezer API
+
+If you don't want your Deezer API to go down using a public proxy, you can set up your own local proxy. Here are the steps:
+
+## Steps to Set Up the Local Proxy
+
+### 1. Clone the CORS Anywhere repository
+
+First, clone the [CORS Anywhere](https://github.com/Rob--W/cors-anywhere.git) repository.
+
+```bash
+git clone https://github.com/Rob--W/cors-anywhere.git
+
+cd cors-anywhere
+npm install
+
+node server.js
+
+try {
+  const response = await fetch(
+    `http://localhost:8080/https://api.deezer.com/search?q=${searchQuery.value}`
+  );
+  if (!response.ok) throw new Error('Error fetching data');
+  const data = await response.json();
+
+  searchResults.value.songs = data.data; // Assign the song results
+} catch (error) {
+  console.error('Error:', error);
+}
