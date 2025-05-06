@@ -1,60 +1,80 @@
-# deezer
+# Deezer Vue 3 App
 
-This template should help get you started developing with Vue 3 in Vite.
+This project is a starter template for developing a Vue 3 application using Vite that consumes the Deezer API.
 
-## Recommended IDE Setup
+---
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+## ✨ Recommended Setup
 
-## Customize configuration
+- [Visual Studio Code](https://code.visualstudio.com/)
+- Extensions:
+  - [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (Disable Vetur if installed)
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+---
 
-## Project Setup
+## 📁 Project Setup
 
-```sh
+```bash
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+---
 
-```sh
+## ⚙️ Development Commands
+
+### Start development server with hot-reload:
+```bash
 npm run dev
 ```
 
-### Compile and Minify for Production
-
-```sh
+### Build for production:
+```bash
 npm run build
 ```
 
+---
 
-# Local Proxy for the Deezer API
+## 🔗 Local Proxy for the Deezer API
 
-If you don't want your Deezer API to go down using a public proxy, you can set up your own local proxy. Here are the steps:
+To avoid CORS issues when making requests to the Deezer API, you can set up a local proxy using the [CORS Anywhere](https://github.com/Rob--W/cors-anywhere.git) project.
 
-## Steps to Set Up the Local Proxy
+### Steps to set up the local proxy:
 
-### 1. Clone the CORS Anywhere repository
+1. **Clone the CORS Anywhere repository:**
+   ```bash
+   git clone https://github.com/Rob--W/cors-anywhere.git
+   cd cors-anywhere
+   npm install
+   node server.js
+   ```
 
-First, clone the [CORS Anywhere](https://github.com/Rob--W/cors-anywhere.git) repository.
+2. **Use the proxy in your requests:**
 
-```bash
-git clone https://github.com/Rob--W/cors-anywhere.git
+   ```js
+   try {
+     const response = await fetch(
+       `http://localhost:8080/https://api.deezer.com/search?q=${searchQuery.value}`
+     );
+     if (!response.ok) throw new Error('Error fetching data');
+     const data = await response.json();
+     searchResults.value.songs = data.data;
+   } catch (error) {
+     console.error('Error:', error);
+   }
+   ```
 
-cd cors-anywhere
-npm install
+> ℹ️ Make sure the proxy server is running before making requests.
 
-node server.js
+---
 
-try {
-  const response = await fetch(
-    `http://localhost:8080/https://api.deezer.com/search?q=${searchQuery.value}`
-  );
-  if (!response.ok) throw new Error('Error fetching data');
-  const data = await response.json();
+## 📄 Additional Resources
 
-  searchResults.value.songs = data.data; // Assign the song results
-} catch (error) {
-  console.error('Error:', error);
-}
+- [Vue 3 Documentation](https://vuejs.org/)
+- [Vite Configuration Guide](https://vitejs.dev/config/)
+- [Deezer API](https://developers.deezer.com/api)
+
+---
+
+## ✉️ License
+
+This project is licensed under the MIT License.
